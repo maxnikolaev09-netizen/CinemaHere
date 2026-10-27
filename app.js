@@ -195,36 +195,50 @@
     rememberMedia();
     $('episodesKind').textContent = type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
     $('episodesTitle').textContent = item.title;
-    $('episodesTitle').nextElementSibling.textContent = item.description ? item.description + ' Выберите сезон и серию.' : 'Выберите сезон и серию.';
+    $('episodesTitle').nextElementSibling.textContent = (item.description ? item.description + ' ' : '') + 'Выберите сезон и серию. ' + seasonSummary(type, item);
     renderEpisodes(1);
     location.hash = '#episodes';
   }
-  function renderEpisodes(season) {
-    currentMedia.season = season;
-    var tabs = $('seasonTabs'), grid = $('episodeGrid');
-    tabs.innerHTML = '';
-    [1,2].forEach(function (n) {
-      var b = document.createElement('button');
-      b.type = 'button'; b.className = 'season-tab'; b.textContent = 'Сезон ' + n;
-      b.setAttribute('aria-pressed', n === season ? 'true' : 'false'); b.dataset.season = n;
-      tabs.appendChild(b);
-    });
-    grid.innerHTML = '';
-    for (var n = 1; n <= 8; n++) {
-      var episodeId = 's' + String(season).padStart(2,'0') + 'e' + String(n).padStart(2,'0');
-      var label = 'Серия ' + n;
-      var card = document.createElement('button');
-      card.type = 'button'; card.className = 'episode-card'; card.dataset.episodePlay = episodeId;
-      var stills = assets.episodes || {};
-      var still = stills[currentMedia.type + '/' + currentMedia.item.id + '/' + episodeId] || 'assets/episodes/' + currentMedia.type + '/' + currentMedia.item.id + '/' + episodeId + '.webp';
-      card.innerHTML = '<div class="episode-still"><span class="episode-number">' + String(n).padStart(2,'0') + '</span><span class="episode-still-placeholder">КАДР СЕРИИ</span><img src="' + safeText(still) + '" alt="" onerror="this.hidden=true"><span class="episode-play" aria-hidden="true">▶</span></div><div class="episode-copy"><b>' + label + '</b><small>Сезон ' + season + ' · ' + (n + 20) + ' мин</small></div>';
-      grid.appendChild(card);
-    }
+  function seasonSummary(type, item) {
+    var mediaType = type === 'film' ? 'films' : type;
+    var entry = (media[mediaType] || {})[item.id] || {};
+    var counts = entry.seasons || [8,8];
+    var total = counts.reduce(function (sum, count) { return sum + count; }, 0);
+    return 'Всего: ' + counts.length + ' сез. · ' + total + ' сер.';
   }
-  $('seasonTabs').addEventListener('click', function (e) {
-    var b = e.target.closest('[data-season]');
-    if (b) { renderEpisodes(+b.dataset.season); rememberMedia(); }
-  });
+  function renderEpisodes() {
+    var mediaType = currentMedia.type === 'film' ? 'films' : currentMedia.type;
+    var entry = (media[mediaType] || {})[currentMedia.item.id] || {};
+    var counts = entry.seasons || [8,8];
+    var container = $('episodeGrid');
+    container.innerHTML = '';
+    counts.forEach(function (episodeCount, index) {
+      var season = index + 1;
+      var section = document.createElement('section');
+      section.className = 'episode-season';
+      var heading = document.createElement('div');
+      heading.className = 'episode-season-heading';
+      var title = (entry.seasonTitles && entry.seasonTitles[index]) || season + ' сезон';
+      heading.innerHTML = '<h2>' + safeText(title) + '</h2><span class="episode-season-count">' + episodeCount + ' серий</span>';
+      var grid = document.createElement('div');
+      grid.className = 'episode-choice-grid';
+      for (var number = 1; number <= episodeCount; number++) {
+        var episodeId = 's' + String(season).padStart(2,'0') + 'e' + String(number).padStart(2,'0');
+        var hasStream = !!((entry.episodes || {})[episodeId]);
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'episode-choice';
+        button.dataset.episodePlay = episodeId;
+        button.dataset.streamAvailable = hasStream ? 'true' : 'false';
+        button.setAttribute('aria-label', 'Смотреть ' + title + ', серия ' + number);
+        button.textContent = number + ' серия';
+        grid.appendChild(button);
+      }
+      section.appendChild(heading);
+      section.appendChild(grid);
+      container.appendChild(section);
+    });
+  }
 
   /* ---------- playable video sources ---------- */
   function mediaUrl(kind) {
@@ -287,7 +301,7 @@
         ? 'Ссылка не поддерживается. Используйте адрес плеера VK Видео или RUTUBE либо файл MP4.'
         : (kind === 'trailer'
           ? 'Трейлер пока не добавлен. Вставьте ссылку VK Видео или RUTUBE в media-config.js.'
-          : 'Видео пока не добавлено. Положите MP4 в assets/videos и укажите путь к нему в media-config.js.');
+          : (currentMedia.episode ? 'Для этой серии пока не добавлен источник. Добавьте разрешённую ссылку VK Видео или RUTUBE в media-config.js.' : currentMedia.type === 'film' ? 'Полный фильм пока не подключён. Добавьте разрешённую ссылку VK Видео или RUTUBE либо путь к MP4 в media-config.js.' : 'Добавьте разрешённую ссылку VK Видео или RUTUBE в media-config.js.'));
       dialog.showModal();
     }
   }
@@ -317,7 +331,7 @@
     if (sid === 'episodes' && currentMedia.item && currentMedia.type !== 'film') {
       $('episodesKind').textContent = currentMedia.type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
       $('episodesTitle').textContent = currentMedia.item.title;
-      $('episodesTitle').nextElementSibling.textContent = currentMedia.item.description ? currentMedia.item.description + ' Выберите сезон и серию.' : 'Выберите сезон и серию.';
+      $('episodesTitle').nextElementSibling.textContent = (currentMedia.item.description ? currentMedia.item.description + ' ' : '') + 'Выберите сезон и серию. ' + seasonSummary(currentMedia.type, currentMedia.item);
       renderEpisodes(currentMedia.season || 1);
     }
     var changed = sid !== current;

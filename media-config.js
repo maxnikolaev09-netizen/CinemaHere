@@ -51,27 +51,27 @@ window.CINEMAHERE_ASSETS = {
 */
 window.CINEMAHERE_MEDIA = {
   films: {
-    "film-1": { trailer: "https://rutube.ru/video/23c9f7025b5e108bdef9a8bb2628b993/" },
-    "film-2": { trailer: "https://rutube.ru/video/1135ebdc2281e646badd2ce754fa3839/" },
-    "film-3": { trailer: "https://rutube.ru/video/0406f7c38f6a0e8511de3ab893d59189/" },
-    "film-4": { trailer: "https://rutube.ru/video/f1f999e698674de1b6ddb1b71b8aa308/" },
-    "film-5": { trailer: "https://rutube.ru/video/b4875ee9b7bf0601927b4cf85d1a777c/" },
-    "film-6": { trailer: "https://rutube.ru/video/f85c5101d43fbf83e85ee6e85082d4a0/" }
+    "film-1": { trailer: "https://rutube.ru/video/23c9f7025b5e108bdef9a8bb2628b993/", movie: "https://rutube.ru/video/afcd39060c175d534cffc7d69ea00e6c/" },
+    "film-2": { trailer: "https://rutube.ru/video/1135ebdc2281e646badd2ce754fa3839/", movie: "https://rutube.ru/video/ce63edddc60fbf03f6152bdc0fd703cb/" },
+    "film-3": { trailer: "https://rutube.ru/video/0406f7c38f6a0e8511de3ab893d59189/", movie: "https://rutube.ru/video/74fb252e6f3a0e6eaedb0909dc6eaf29/" },
+    "film-4": { trailer: "https://rutube.ru/video/f1f999e698674de1b6ddb1b71b8aa308/", movie: "https://rutube.ru/video/7458662c635c277ec0bacd01abae1743/" },
+    "film-5": { trailer: "https://rutube.ru/video/b4875ee9b7bf0601927b4cf85d1a777c/", movie: "https://rutube.ru/video/307c52af7c3e122855aea0899c247971/" },
+    "film-6": { trailer: "https://rutube.ru/video/f85c5101d43fbf83e85ee6e85082d4a0/", movie: "https://rutube.ru/video/0c04896db8d35c1586c9f8941c639d7f/" }
   },
   series: {
-    "series-1": { trailer: "https://rutube.ru/video/acc893f460b1711c0f27dc1c076040f9/" },
-    "series-2": { trailer: "https://rutube.ru/video/89ff405043e890fb1ff05ff545726458/" },
-    "series-3": { trailer: "https://rutube.ru/video/3798d1d34c9c59eaefceb3252cadbb56/" },
-    "series-4": { trailer: "https://rutube.ru/video/6836b8c7f8fe8305f80881bb002f9b42/" },
-    "series-5": { trailer: "https://rutube.ru/video/fa4f9878aac647aaee278060dec2668c/" },
-    "series-6": { trailer: "https://rutube.ru/video/0b03498c70d6b6084103033c4010efe5/" }
+    "series-1": { trailer: "https://rutube.ru/video/acc893f460b1711c0f27dc1c076040f9/", seasons: [10, 8, 8], episodes: {} },
+    "series-2": { trailer: "https://rutube.ru/video/89ff405043e890fb1ff05ff545726458/", seasons: [13], episodes: {} },
+    "series-3": { trailer: "https://rutube.ru/video/3798d1d34c9c59eaefceb3252cadbb56/", seasons: [10, 10, 10, 10, 10, 15], episodes: {} },
+    "series-4": { trailer: "https://rutube.ru/video/6836b8c7f8fe8305f80881bb002f9b42/", seasons: [12, 16, 16, 16, 16, 16, 16, 16, 10], episodes: {} },
+    "series-5": { trailer: "https://rutube.ru/video/fa4f9878aac647aaee278060dec2668c/", seasons: [12, 12, 12, 12, 12, 12, 12, 12], episodes: {} },
+    "series-6": { trailer: "https://rutube.ru/video/0b03498c70d6b6084103033c4010efe5/", seasons: [23, 23, 24, 24, 22, 22, 13], episodes: {} }
   },
   anime: {
-    "anime-1": { trailer: "https://rutube.ru/video/972f6f9c662861b0655930ceacd723a5/" },
-    "anime-2": { trailer: "https://rutube.ru/video/dbe0f3bf1aab168ab4d7d207f7321f05/" },
-    "anime-3": { trailer: "" },
-    "anime-4": { trailer: "" },
+    "anime-1": { trailer: "https://rutube.ru/video/972f6f9c662861b0655930ceacd723a5/", seasons: [10, 10], seasonTitles: ["Сезон 1 — Бегущие по краю", "Сезон 2 — Edgerunners 2"], episodes: {} },
+    "anime-2": { trailer: "https://rutube.ru/video/dbe0f3bf1aab168ab4d7d207f7321f05/", seasons: [25, 12, 22, 30], episodes: {} },
+    "anime-3": { trailer: "", seasons: [26, 13], episodes: {} },
+    "anime-4": { trailer: "", seasons: [37], episodes: {} },
     "anime-5": { trailer: "" },
-    "anime-6": { trailer: "" }
+    "anime-6": { trailer: "", seasons: [12, 12, 12], episodes: {} }
   }
 };

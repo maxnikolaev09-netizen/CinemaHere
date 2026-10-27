@@ -788,3 +788,51 @@ body::after { animation-delay: -7s, -2s; }
 @media (prefers-reduced-motion: reduce) {
   .dust-field i { animation: none; opacity: .48; }
 }
+
+/* Сезоны и серии — компактные номерные кнопки */
+.episodes-heading { align-items:flex-start; }
+.episode-seasons {
+  display:grid;
+  margin:16px 0 46px;
+  overflow:hidden;
+  border:1px solid #273646;
+  border-radius:16px;
+  background:linear-gradient(145deg,#0c121a,#0a0f15);
+  box-shadow:0 18px 48px #0003;
+}
+.episode-season { padding:22px 20px 24px; }
+.episode-season + .episode-season { border-top:1px solid #263340; }
+.episode-season-heading { display:flex; align-items:baseline; justify-content:center; gap:12px; margin:0 0 15px; text-align:center; }
+.episode-season-heading h2 { margin:0; color:#e8edf2; font-size:clamp(18px,2.5vw,23px); font-weight:700; }
+.episode-season-count { color:#8493a2; font-size:12px; }
+.episode-choice-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(104px,1fr)); gap:6px; }
+.episode-choice {
+  min-width:0;
+  min-height:44px;
+  padding:8px 10px;
+  border:1px solid #334252;
+  border-radius:7px;
+  background:linear-gradient(135deg,#1b2632,#17212b);
+  color:#d9e2eb;
+  font:inherit;
+  font-size:14px;
+  font-weight:600;
+  text-align:center;
+  cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+.episode-season:nth-child(even) .episode-choice { background:linear-gradient(135deg,#1a2930,#152229); border-color:#30434a; }
+.episode-choice:hover { transform:translateY(-2px); border-color:#659bc2; background:linear-gradient(135deg,#263d52,#1a2d3e); box-shadow:0 7px 20px #0004; }
+.episode-season:nth-child(even) .episode-choice:hover { background:linear-gradient(135deg,#24424b,#1a3038); border-color:#6193a0; }
+.episode-choice:active { transform:translateY(0) scale(.98); }
+.episode-choice:focus-visible { outline:2px solid #7bb4df; outline-offset:2px; }
+.episode-choice[data-stream-available="true"] { border-color:#5a91b7; }
+@media(max-width:640px) {
+  .episode-seasons { margin-top:10px; border-radius:12px; }
+  .episode-season { padding:19px 12px 21px; }
+  .episode-choice-grid { grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:5px; }
+  .episode-choice { min-height:42px; padding:7px 5px; font-size:13px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .episode-choice { transition:none; }
+}
