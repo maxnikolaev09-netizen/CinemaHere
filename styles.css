@@ -432,6 +432,8 @@ body.movie-active #movie .movie-actions .btn { min-height:56px; padding-inline:2
 .player-dialog { width:min(900px,calc(100% - 32px)); border:1px solid #4c6579; border-radius:18px; padding:18px; background:#080d13; color:var(--text); box-shadow:0 28px 100px #000c; }
 .player-dialog::backdrop { background:#03060bcc; backdrop-filter:blur(5px); }
 .player-dialog video { display:block; width:100%; max-height:72svh; border-radius:10px; background:#000; }
+.player-dialog iframe { display:block; width:100%; aspect-ratio:16/9; max-height:72svh; border:0; border-radius:10px; background:#000; }
+.player-dialog video[hidden], .player-dialog iframe[hidden], .player-dialog .player-hint[hidden] { display:none !important; }
 .player-close { position:absolute; z-index:2; top:10px; right:10px; width:34px; height:34px; border:1px solid #ffffff30; border-radius:50%; background:#080d13; color:#eaf1f7; font-size:21px; cursor:pointer; }
 .player-hint { min-height:170px; display:grid; place-items:center; padding:35px 24px; text-align:center; color:#a6b4c1; font-size:14px; line-height:1.7; }
 @media(max-width:860px) { .episode-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
@@ -450,3 +452,339 @@ body.movie-active #movie .movie-actions .btn { min-height:56px; padding-inline:2
 
 .poster-image:not([hidden])~span { opacity:0; }
 .logo-image { width:26px; height:26px; max-width:26px; object-fit:contain; }
+
+.banner .back.has-frame { color:#e5edf4; text-shadow:0 2px 14px #000; }
+
+/* Показываем весь исходный кадр; размытая копия заполняет широкие боковые поля. */
+.banner .back.has-frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #070b11 !important;
+}
+.banner .back.has-frame::before,
+.banner .back.has-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.banner .back.has-frame::before {
+  z-index: 0;
+  background-image: var(--frame-image);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(20px) brightness(.42);
+  transform: scale(1.08);
+}
+.banner .back.has-frame::after {
+  z-index: 2;
+  background-image: linear-gradient(180deg, rgba(4,8,14,.08), rgba(4,8,14,.40)), var(--frame-image);
+  background-size: 100% 100%, contain;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+/* Слайдер главного: чуть шире, с кадрами из каталога */
+@media (min-width: 861px) {
+  .slide { width: min(660px, 70%); }
+}
+.slide .frame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #080d14;
+  color: #e8edf4;
+}
+.slide .frame::before,
+.slide .frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.slide .frame::before {
+  z-index: -2;
+  background-image: var(--slide-image, linear-gradient(135deg, #243748, #080b10));
+  background-position: center;
+  background-size: cover;
+  filter: blur(2px) brightness(.42) saturate(.82);
+  transform: scale(1.04);
+}
+.slide .frame::after {
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(4,8,14,.18), rgba(4,8,14,.84));
+}
+.slide .frame > * { position: relative; z-index: 1; }
+
+/* Кадр плавно растворяется в размытой подложке по краям. */
+.banner .back.has-frame::after {
+  background-image: linear-gradient(180deg, rgba(4,8,14,.08), rgba(4,8,14,.40));
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.banner .back.has-frame .frame-shot {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  margin: auto;
+  object-fit: contain;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 68%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, #000 68%, transparent 100%);
+}
+.banner .back.has-frame .frame-shot[hidden] { display: none !important; }
+/* Усиленный мягкий край кадра: кадр постепенно проявляется из размытого фона. */
+.banner .back.has-frame .frame-shot {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  filter: drop-shadow(0 0 26px rgba(5,10,16,.78));
+}
+
+/* Возврат к каталогу */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 16px;
+  border: 1px solid rgba(108,174,224,.58);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(15,34,50,.96), rgba(7,14,22,.94));
+  color: #edf7ff;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 26px rgba(0,0,0,.45), inset 0 1px rgba(255,255,255,.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.back-link::before {
+  content: "";
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #73b9ee;
+  box-shadow: 0 0 12px rgba(93,169,223,.8);
+}
+.back-link:hover {
+  color: #fff;
+  border-color: #88c8f4;
+  background: linear-gradient(135deg, #163650, #0a1521);
+  box-shadow: 0 10px 30px rgba(36,116,173,.28), inset 0 1px rgba(255,255,255,.1);
+  transform: translateY(-2px);
+}
+body.movie-active #movie .back-link {
+  color: #f4faff;
+  border-color: rgba(137,198,239,.72);
+  background: rgba(7,15,24,.9);
+  box-shadow: 0 8px 30px rgba(0,0,0,.58), 0 0 20px rgba(62,146,203,.12);
+}
+
+/* Технологичный фон по краям страницы */
+body {
+  position: relative;
+  isolation: isolate;
+}
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  width: clamp(48px, 7vw, 118px);
+  pointer-events: none;
+  opacity: .78;
+  background-image:
+    radial-gradient(ellipse at 26% 48%, rgba(38,132,195,.36), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(96,177,226,.36) 40px, transparent 41px 80px),
+    repeating-linear-gradient(90deg, transparent 0 27px, rgba(72,150,203,.32) 28px, transparent 29px 56px),
+    radial-gradient(circle, rgba(156,220,255,.98) 0 1.5px, transparent 2.5px),
+    linear-gradient(135deg, transparent 46%, rgba(66,152,207,.52) 47%, transparent 48%);
+  background-size: 100% 100%, 100% 80px, 56px 100%, 56px 80px, 100% 180px;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+  animation: side-circuit-flow 18s linear infinite;
+}
+body::before {
+  left: 0;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+}
+body::after {
+  right: 0;
+  transform: scaleX(-1);
+  animation-delay: -12s;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+}
+body > header,
+body > main,
+body > footer {
+  position: relative;
+  z-index: 1;
+}
+@keyframes side-circuit-flow {
+  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: 0 0, 0 160px, 0 0, 0 120px, 0 -180px; }
+}
+.card[hidden] { display: none !important; }
+@media (max-width: 760px) {
+  body::before, body::after { opacity: .66; width: 38px; }
+}
+@media (max-width: 560px) {
+  body::before, body::after { display: block; opacity: .5; width: 18px; }
+}
+/* Более заметное растворение кадра в подложке */
+.banner .back.has-frame::before {
+  filter: blur(30px) brightness(.68) saturate(1.05);
+  transform: scale(1.16);
+}
+.banner .back.has-frame .frame-shot {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 68%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 32%, #000 68%, transparent 100%);
+  filter: none;
+  opacity: .98;
+}
+/* Постер Cyberpunk в секции регистрации: исходное изображение всегда целиком в кадре. */
+.hero-right {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  min-height: clamp(430px, 44vw, 650px);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: none;
+  background: #090e14;
+}
+.hero-right::before,
+.hero-right::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.hero-right::before {
+  z-index: 0;
+  background: url("assets/posters/4.avif") center / cover no-repeat;
+  filter: blur(26px) brightness(.55) saturate(.85);
+  transform: scale(1.1);
+}
+.hero-right::after {
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(4,8,13,.20), transparent 38%, rgba(4,8,13,.16)),
+    linear-gradient(0deg, rgba(4,8,13,.24), transparent 26%, transparent 74%, rgba(4,8,13,.18));
+}
+.hero-right .hero-poster-link {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.hero-right .hero-register-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 16px 42px rgba(0,0,0,.55));
+  transition: filter .35s var(--ease);
+}
+.hero-right .hero-poster-link:hover .hero-register-poster {
+  filter: drop-shadow(0 18px 48px rgba(0,0,0,.7)) brightness(1.06);
+}
+.hero-right .hero-poster-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -5px;
+}
+@media (max-width: 860px) {
+  .hero-right { min-height: clamp(340px, 76vw, 520px); border-top: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::before, body::after { animation: none; }
+}
+/* Более чёткий контур постера и плотный боковой техно-узор. */
+body::before,
+body::after {
+  width: clamp(56px, 9vw, 140px);
+  opacity: .96;
+  background-image:
+    radial-gradient(ellipse at 26% 48%, rgba(51,160,226,.48), transparent 70%),
+    repeating-linear-gradient(0deg, transparent 0 25px, rgba(111,194,241,.48) 26px, transparent 27px 52px),
+    repeating-linear-gradient(90deg, transparent 0 17px, rgba(91,174,226,.42) 18px, transparent 19px 36px),
+    radial-gradient(circle, rgba(188,232,255,1) 0 1.7px, transparent 2.8px),
+    linear-gradient(135deg, transparent 46%, rgba(82,180,236,.66) 47%, transparent 48%);
+  background-size: 100% 100%, 100% 52px, 36px 100%, 36px 52px, 100% 140px;
+  animation: side-circuit-flow 15s linear infinite, side-circuit-pulse 4.5s ease-in-out infinite alternate;
+}
+body::after { animation-delay: -7s, -2s; }
+@keyframes side-circuit-pulse {
+  from { opacity: .62; }
+  to { opacity: 1; }
+}
+@media (max-width: 760px) {
+  body::before, body::after { width: clamp(34px, 8vw, 54px); opacity: .82; }
+}
+@media (max-width: 560px) {
+  body::before, body::after { display: block; width: 22px; opacity: .7; }
+}
+.hero-right .hero-poster-link {
+  inset: 14px;
+  border-radius: 18px;
+}
+.hero-right .hero-register-poster {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: auto;
+  border-radius: 18px;
+  outline: 1px solid rgba(190,224,246,.34);
+  filter: drop-shadow(0 18px 44px rgba(0,0,0,.58)) contrast(1.08) saturate(1.08);
+}
+.hero-right .hero-poster-link:hover .hero-register-poster {
+  filter: drop-shadow(0 20px 52px rgba(0,0,0,.72)) contrast(1.1) saturate(1.1);
+}
+
+/* Белые пылинки дрейфуют за содержимым, не перехватывая клики. */
+.dust-field {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dust-field i {
+  position: absolute;
+  display: block;
+  width: var(--dot, 3px);
+  height: var(--dot, 3px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, #fff 0 20%, #d8f1ff 40%, rgba(116,190,231,.55) 70%, transparent 100%);
+  box-shadow: 0 0 7px rgba(214,242,255,.88), 0 0 18px rgba(100,178,224,.55);
+  opacity: .25;
+  animation: dust-drift var(--float-time, 28s) ease-in-out var(--wait, 0s) infinite;
+  will-change: transform, opacity;
+}
+.dust-field i:nth-child(3n + 1) { animation-direction: reverse; }
+.dust-field i:nth-child(4n) { filter: blur(.35px); }
+@keyframes dust-drift {
+  0%, 100% { transform: translate3d(0,0,0) scale(.7); opacity: .18; }
+  22% { transform: translate3d(19px,-27px,0) scale(1.12); opacity: .88; }
+  49% { transform: translate3d(-13px,-61px,0) scale(.82); opacity: .38; }
+  74% { transform: translate3d(29px,-36px,0) scale(1.18); opacity: .78; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dust-field i { animation: none; opacity: .48; }
+}

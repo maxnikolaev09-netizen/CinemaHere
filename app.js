@@ -6,28 +6,28 @@
   var assets = window.CINEMAHERE_ASSETS || {};
   var media = window.CINEMAHERE_MEDIA || { films: {}, series: {}, anime: {} };
   var films = [
-    { id:'film-1', title:'Название фильма', meta:'Драма · 2026', hue:215, year:'2026', genre:'Драма', duration:'1 ч 54 мин', age:'16+', description:'Здесь будет описание сюжета: о чём фильм, кто главные герои и почему его стоит посмотреть. Текст можно заменить на любой.', credits:'В ролях: Имя Фамилия, Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.5' },
-    { id:'film-2', title:'Гори, гори, ясно!', meta:'Ужастик · 2025', hue:260, year:'2025', genre:'Триллер', duration:'1 ч 48 мин', age:'18+', description:'История о тайне, которая постепенно меняет жизнь героев. Замените описание на сюжет вашего фильма.', credits:'В ролях: Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.7' },
-    { id:'film-3', title:'Тёмный рыцарь', meta:'Боевик · 2012', hue:190, year:'2026', genre:'Комедия', duration:'1 ч 32 мин', age:'12+', description:'Лёгкая история о неожиданных встречах и важных решениях.', credits:'В ролях: Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.2' },
-    { id:'film-4', title:'Топ Ган', meta:'Боевик · 1986', hue:235, year:'2026', genre:'Фантастика', duration:'2 ч 06 мин', age:'16+', description:'Приключение в мире будущего. Добавьте здесь собственный синопсис.', credits:'В ролях: Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.8' },
-    { id:'film-5', title:'Матрица', meta:'Фантастика · 1999', hue:205, year:'2024', genre:'Приключения', duration:'1 ч 57 мин', age:'12+', description:'Путешествие, которое станет главным испытанием для героев.', credits:'В ролях: Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.4' },
-    { id:'film-6', title:'Волк с Уол-стрит', meta:'Драмма · 2013', hue:245, year:'2025', genre:'Детектив', duration:'1 ч 51 мин', age:'16+', description:'Запутанное расследование и несколько неожиданных поворотов.', credits:'В ролях: Имя Фамилия. Режиссёр: Имя Фамилия.', rating:'4.6' }
+    { id:'film-1', title:'Форсаж 10', meta:'Боевик · 2023', hue:215, year:'2023', genre:'Боевик', duration:'2 ч 21 мин', age:'16+', description:'Доминик Торетто и его семья становятся мишенью Данте Рейеса, сына наркобарона, с которым они столкнулись в прошлом. Данте годами готовил месть и теперь превращает жизнь героев в гонку по всему миру. Доминику предстоит защитить близких и снова собрать команду.', credits:'В ролях: Вин Дизель, Мишель Родригес, Джейсон Момоа. Режиссёр: Луи Летерье.', rating:'6.0' },
+    { id:'film-2', title:'Гори, гори, ясно!', meta:'Ужасы · 2019', hue:260, year:'2019', genre:'Ужасы, фантастика', duration:'1 ч 30 мин', age:'18+', description:'Супруги из Канзаса находят младенца после падения загадочного космического корабля и растят его как родного сына. Когда у мальчика начинают проявляться необычные способности, родители пытаются помочь ему справиться с ними. Постепенно становится ясно, что сила ребёнка несёт смертельную угрозу окружающим.', credits:'В ролях: Джексон Данн, Элизабет Бэнкс, Дэвид Денман. Режиссёр: Дэвид Яровески.', rating:'5.9' },
+    { id:'film-3', title:'Тёмный рыцарь', meta:'Боевик · 2008', hue:190, year:'2008', genre:'Боевик, фантастика', duration:'2 ч 32 мин', age:'16+', description:'Бэтмен, комиссар Гордон и прокурор Харви Дент объединяются, чтобы очистить Готэм от преступности. Их план рушит Джокер — преступник, который превращает город в арену жестоких испытаний. Чтобы остановить хаос, Брюсу Уэйну придётся столкнуться с пределами собственной веры в справедливость.', credits:'В ролях: Кристиан Бэйл, Хит Леджер, Аарон Экхарт. Режиссёр: Кристофер Нолан.', rating:'8.5' },
+    { id:'film-4', title:'Топ Ган', meta:'Боевик · 1986', hue:235, year:'1986', genre:'Боевик, драма', duration:'1 ч 50 мин', age:'12+', description:'Пит «Мэверик» Митчелл попадает в элитную школу пилотов ВМС США, где лучшие лётчики соревнуются за право стать первыми. Его талант помогает ему побеждать, но самоуверенность осложняет отношения с товарищами и инструкторами. Мэверику предстоит научиться доверять команде и справиться с тяжёлым наследием отца.', credits:'В ролях: Том Круз, Келли Макгиллис, Вэл Килмер. Режиссёр: Тони Скотт.', rating:'7.1' },
+    { id:'film-5', title:'Матрица', meta:'Фантастика · 1999', hue:205, year:'1999', genre:'Фантастика, боевик', duration:'2 ч 16 мин', age:'16+', description:'Программист и хакер Томас Андерсон подозревает, что привычная реальность скрывает нечто большее. Морфеус и Тринити открывают ему правду о Матрице и мире, в котором человечество оказалось пленником машин. Нео должен решить, готов ли он проснуться и принять роль в борьбе за свободу людей.', credits:'В ролях: Киану Ривз, Лоренс Фишберн, Кэрри-Энн Мосс. Режиссёры: Лана и Лилли Вачовски.', rating:'8.5' },
+    { id:'film-6', title:'Волк с Уолл-стрит', meta:'Драма · 2013', hue:245, year:'2013', genre:'Драма, криминал', duration:'3 ч', age:'18+', description:'Молодой брокер Джордан Белфорт быстро строит успешную компанию и превращает торговлю акциями в источник огромного состояния. За роскошной жизнью скрываются обман клиентов, рискованные сделки и всё более разрушительные привычки. Чем выше поднимается Белфорт, тем пристальнее за ним наблюдают следователи.', credits:'В ролях: Леонардо ДиКаприо, Джона Хилл, Марго Робби. Режиссёр: Мартин Скорсезе.', rating:'8.1' }
   ];
   var series = [
-    { id:'series-1', title:'Дом Дракона', meta:'Фантастика · 2022', hue:205 },
-    { id:'series-2', title:'Название сериала', meta:'Детектив · 2025', hue:225 },
-    { id:'series-3', title:'Кобра-кай', meta:'Комедия · 2026', hue:195 },
-    { id:'series-4', title:'Форс-Мажоры', meta:'Драмма · 2011', hue:240 },
-    { id:'series-5', title:'Декстер', meta:'Детектив · 2004', hue:215 },
-    { id:'series-6', title:'Менталист', meta:'Детектив · 2008', hue:255 }
+    { id:'series-1', title:'Дом Дракона', meta:'Фэнтези · 2022', hue:205, year:'2022', genre:'Фэнтези, драма', age:'18+', rating:'8.1', description:'За несколько поколений до событий «Игры престолов» дом Таргариенов правит Вестеросом, опираясь на силу драконов. После спора о наследовании короны двор раскалывается между принцессой Рейнирой и королевой Алисентой. Семейное противостояние постепенно перерастает в войну, способную изменить судьбу всего королевства.', credits:'В ролях: Эмма Д’Арси, Мэтт Смит, Оливия Кук.' },
+    { id:'series-2', title:'Форс-мажоры: Лос-Анджелес', meta:'Драма · 2025', hue:225, year:'2025', genre:'Драма, юридический', age:'16+', rating:'6.0', description:'Бывший федеральный прокурор Тед Блэк начинает новую карьеру в Лос-Анджелесе и представляет интересы влиятельных клиентов. Его юридическая фирма переживает кризис, поэтому Теду приходится заново выстраивать команду и бороться за её будущее. Деловые интриги осложняются личными конфликтами и непростым прошлым героев.', credits:'В ролях: Стивен Амелл, Лекс Скотт Дэвис, Джош Макдермитт.' },
+    { id:'series-3', title:'Кобра Кай', meta:'Драма · 2018', hue:195, year:'2018', genre:'Драма, комедия, спорт', age:'12+', rating:'8.0', description:'Спустя десятилетия после школьного турнира Джонни Лоуренс решает открыть додзё «Кобра Кай» и начать жизнь заново. Его возвращение снова сталкивает его с Дэниелом ЛаРуссо, который давно построил успешную жизнь и старается следовать урокам мистера Мияги. Старое соперничество втягивает в себя новое поколение учеников, которым предстоит выбрать собственный путь.', credits:'В ролях: Ральф Маччио, Уильям Забка, Соло Маридуэнья.' },
+    { id:'series-4', title:'Форс-мажоры', meta:'Драма · 2011', hue:240, year:'2011', genre:'Драма, комедия', age:'18+', rating:'8.5', description:'Майк Росс обладает феноменальной памятью, но не имеет юридического образования и скрывает это от коллег. Адвокат Харви Спектер всё же берёт его в свою команду, и вместе они ведут сложные дела крупной фирмы в Нью-Йорке. Рабочие победы и конфликты проверяют их партнёрство и секрет, который может разрушить карьеру Майка.', credits:'В ролях: Гэбриел Махт, Патрик Джей Адамс, Сара Рафферти.' },
+    { id:'series-5', title:'Декстер', meta:'Детектив · 2006', hue:215, year:'2006', genre:'Триллер, криминал, детектив', age:'18+', rating:'8.3', description:'Декстер Морган работает экспертом по брызгам крови в полиции Майами и помогает раскрывать убийства. За пределами работы он сам ведёт тайную жизнь серийного убийцы, выбирая жертв среди тех, кому удалось избежать правосудия. Правила, которым его научил отец, помогают ему скрываться, пока расследования и личные отношения подбираются всё ближе.', credits:'В ролях: Майкл С. Холл, Дженнифер Карпентер, Джеймс Римар.' },
+    { id:'series-6', title:'Менталист', meta:'Детектив · 2008', hue:255, year:'2008', genre:'Триллер, детектив, драма', age:'16+', rating:'8.1', description:'Патрик Джейн помогает Калифорнийскому бюро расследований раскрывать преступления благодаря наблюдательности и тонкому знанию человеческой психологии. Его остроумие и нестандартные методы часто раздражают коллег, но помогают находить важные зацепки. Главная личная цель Джейна — выйти на серийного убийцу по прозвищу Красный Джон.', credits:'В ролях: Саймон Бейкер, Робин Танни, Тим Кэнг.' }
   ];
   var anime = [
-    { id:'anime-1', title:'Киберпанк бегущий по лезвию 2', meta:'Экшн · 2026', hue:225 },
-    { id:'anime-2', title:'Атака-Титанов', meta:'Фэнтези · 2011', hue:250 },
-    { id:'anime-3', title:'...', meta:'Приключения · 2026', hue:210 },
-    { id:'anime-4', title:'Тетрадь Смерти', meta:'Детектив · 2006', hue:235 },
-    { id:'anime-5', title:'Наруто', meta:'Фантастика · 1999', hue:195 },
-    { id:'anime-6', title:'Ванпач-мен', meta:'Комедия · 2013', hue:265 }
+    { id:'anime-1', title:'Киберпанк: Бегущие по краю', meta:'Аниме · 2022', hue:225, year:'2022', genre:'Аниме, фантастика, боевик', age:'18+', rating:'7.9', description:'В Найт-Сити подросток Дэвид Мартинес пытается выжить в мире, где технологии и кибернетические импланты доступны не всем. После личной трагедии он устанавливает экспериментальный имплант и присоединяется к команде наёмников. Чем глубже Дэвид погружается в жизнь «бегущего по краю», тем выше цена его силы и амбиций.', credits:'В ролях: Кэнъитиро Охаси, Аои Юки, Кэндзиро Цуда.' },
+    { id:'anime-2', title:'Атака титанов', meta:'Фэнтези · 2013', hue:250, year:'2013', genre:'Аниме, фэнтези, боевик', age:'18+', rating:'8.7', description:'Люди укрываются за высокими стенами, спасаясь от титанов — существ, которые охотятся на человека. После нападения на родной город Эрен Йегер вступает в разведкорпус, чтобы сражаться с чудовищами и защитить оставшихся близких. По мере опасных вылазок герои узнают, что история титанов и устройство мира сложнее, чем казалось.', credits:'В ролях: Юки Кадзи, Юи Исикава, Марина Иноуэ.' },
+    { id:'anime-3', title:'Баки', meta:'Аниме · 2018', hue:210, year:'2018', genre:'Аниме, боевик, спорт', age:'18+', rating:'7.3', description:'Баки Ханма с детства тренируется, чтобы однажды превзойти своего отца Юдзиро — сильнейшего бойца на планете. Его ждут поединки с опасными противниками, каждый из которых проверяет не только силу, но и выдержку. За зрелищными боями стоит личная цель Баки — доказать, что он способен сам выбрать, кем стать.', credits:'В ролях: Нобунага Симадзаки, Акио Оцука, Такэхито Коясу.' },
+    { id:'anime-4', title:'Тетрадь смерти', meta:'Детектив · 2006', hue:235, year:'2006', genre:'Аниме, триллер, детектив', age:'18+', rating:'8.6', description:'Старшеклассник Лайт Ягами находит тетрадь, владелец которой может убить человека, записав его имя. Решив избавить мир от преступников, Лайт начинает скрытую кампанию и привлекает внимание загадочного детектива L. Их противостояние превращается в интеллектуальную дуэль и ставит вопрос о цене справедливости.', credits:'В ролях: Мамору Мияно, Каппэй Ямагути, Сидо Накамура.' },
+    { id:'anime-5', title:'Наруто', meta:'Аниме · 2002', hue:195, year:'2002', genre:'Аниме, фэнтези, боевик', age:'12+', rating:'7.8', description:'Наруто Узумаки — шумный юный ниндзя, который мечтает стать Хокагэ и добиться признания жителей своей деревни. Вместе с товарищами по команде он учится работать сообща, осваивает боевые техники и проходит первые серьёзные испытания. На пути к мечте Наруто сталкивается с соперничеством, опасными врагами и решениями, которые меняют его самого.', credits:'В ролях: Дзюнко Такэути, Тиэ Накамура, Нориаки Сугияма.' },
+    { id:'anime-6', title:'Ванпанчмен', meta:'Аниме · 2015', hue:265, year:'2015', genre:'Аниме, комедия, фантастика', age:'18+', rating:'8.3', description:'Сайтама так усердно тренировался, что теперь побеждает любого противника одним ударом. Вместе с киборгом Геносом он вступает в Ассоциацию героев, которая распределяет задания и оценивает их подвиги. Сайтама ищет достойный вызов, а вокруг него появляются монстры, герои и ситуации, высмеивающие привычные правила супергеройских историй.', credits:'В ролях: Макото Фурукава, Кайто Исикава, Аои Юки.' }
   ];
   var catalog = { film:films, series:series, anime:anime };
   var icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg>';
@@ -125,6 +125,26 @@
     for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
     return list[0];
   }
+  function rememberMedia() {
+    if (!currentMedia.item) return;
+    write('lastMedia', JSON.stringify({
+      type:currentMedia.type,
+      id:currentMedia.item.id,
+      season:currentMedia.season || 1,
+      episode:currentMedia.episode ? currentMedia.episode.id : ''
+    }));
+  }
+  function restoreMedia() {
+    var saved = null;
+    try { saved = JSON.parse(read('lastMedia') || 'null'); } catch (e) {}
+    if (!saved || !catalog[saved.type]) return;
+    var item = findItem(saved.type, saved.id);
+    if (!item || item.id !== saved.id) return;
+    var match = /^s(\d{2})e(\d{2})$/.exec(saved.episode || '');
+    var season = match ? +match[1] : (+saved.season || 1);
+    var episode = match ? { id:saved.episode, number:+match[2], label:'Серия ' + (+match[2]), description:'' } : null;
+    currentMedia = { type:saved.type, item:item, episode:episode, season:season };
+  }
   function setMovieScreen() {
     var item = currentMedia.item || films[0], type = currentMedia.type || 'film';
     var title = item.title;
@@ -133,9 +153,34 @@
     $('movieGenre').textContent = item.genre || item.meta.split('·')[0].trim();
     $('movieDuration').textContent = currentMedia.episode ? 'Сезон ' + currentMedia.season : (item.duration || 'Сезон 1');
     $('movieAge').textContent = item.age || '16+';
-    $('movieDescription').textContent = currentMedia.episode ? 'Эпизод ' + currentMedia.episode.number + ': ' + (currentMedia.episode.description || 'Описание серии можно изменить в настройках каталога.') : (item.description || 'Описание появится здесь.');
+    $('movieDescription').textContent = currentMedia.episode ? (currentMedia.episode.description || item.description || 'Описание серии пока не добавлено.') : (item.description || 'Описание появится здесь.');
+    $('movieDescription').previousElementSibling.textContent = currentMedia.episode ? (type === 'series' ? 'О сериале' : 'Об аниме') : (type === 'series' ? 'Описание сериала' : type === 'anime' ? 'Описание аниме' : 'Описание фильма');
     $('movieCredits').textContent = item.credits || 'Нажмите «Смотреть», чтобы начать просмотр.';
-    $('movieFrameCaption').textContent = currentMedia.episode ? 'кадр из серии' : 'кадр из фильма';
+    var frameEl = $('movieFrameCaption');
+    frameEl.textContent = '';
+    frameEl.setAttribute('aria-hidden', 'true');
+    var frameShot = frameEl.querySelector('.frame-shot');
+    if (!frameShot) {
+      frameShot = document.createElement('img');
+      frameShot.className = 'frame-shot';
+      frameShot.alt = '';
+      frameShot.draggable = false;
+      frameEl.appendChild(frameShot);
+    }
+    var frameMap = assets.frames || {};
+    var frameKey = currentMedia.episode ? type + '/' + item.id + '/' + currentMedia.episode.id : item.id;
+    var frameUrl = frameMap[frameKey] || frameMap[item.id] || '';
+    if (frameUrl) {
+      frameEl.style.setProperty('--frame-image', 'url("' + frameUrl + '")');
+      frameShot.hidden = false;
+      frameShot.onerror = function () { frameShot.hidden = true; };
+      frameShot.src = frameUrl;
+    } else {
+      frameEl.style.removeProperty('--frame-image');
+      frameShot.hidden = true;
+      frameShot.removeAttribute('src');
+    }
+    frameEl.classList.toggle('has-frame', !!frameUrl);
     $('moviePoster').style.setProperty('--h', item.hue || 215);
     var img = $('moviePosterImage');
     img.hidden = false;
@@ -147,8 +192,10 @@
   }
   function openEpisodes(type, item) {
     currentMedia = { type:type, item:item, episode:null, season:1 };
+    rememberMedia();
     $('episodesKind').textContent = type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
     $('episodesTitle').textContent = item.title;
+    $('episodesTitle').nextElementSibling.textContent = item.description ? item.description + ' Выберите сезон и серию.' : 'Выберите сезон и серию.';
     renderEpisodes(1);
     location.hash = '#episodes';
   }
@@ -176,7 +223,7 @@
   }
   $('seasonTabs').addEventListener('click', function (e) {
     var b = e.target.closest('[data-season]');
-    if (b) renderEpisodes(+b.dataset.season);
+    if (b) { renderEpisodes(+b.dataset.season); rememberMedia(); }
   });
 
   /* ---------- playable video sources ---------- */
@@ -186,20 +233,61 @@
     if (type === 'film') return entry.movie || '';
     return (entry.episodes || {})[currentMedia.episode ? currentMedia.episode.id : ''] || '';
   }
+  function providerEmbedUrl(source) {
+    var src = String(source || '').trim();
+    var iframeMatch = src.match(/<iframe\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/i);
+    if (iframeMatch) src = iframeMatch[1].replace(/&amp;/g, '&');
+    try {
+      var url = new URL(src, location.href);
+      var host = url.hostname.toLowerCase().replace(/^www\./, '');
+      if (host === 'rutube.ru') {
+        if (/^\/play\/embed\/[\w-]+\/?/.test(url.pathname)) return url.href;
+        var rutubeId = (url.pathname.match(/^\/video\/(?:private\/)?([\w-]{8,})\/?$/i) || [])[1];
+        if (rutubeId) {
+          url.pathname = '/play/embed/' + rutubeId + '/';
+          return url.href;
+        }
+      }
+      if (host === 'vkvideo.ru' || host === 'vk.com' || host === 'vk.ru') {
+        if (url.pathname === '/video_ext.php' && url.searchParams.get('oid') && url.searchParams.get('id')) return url.href;
+      }
+    } catch (error) { return ''; }
+    return '';
+  }
+  function isDirectVideoFile(source) {
+    try {
+      var url = new URL(source, location.href);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return true;
+      return /\.(?:mp4|webm|ogg|m4v)$/i.test(url.pathname);
+    } catch (error) { return false; }
+  }
   function openPlayer(kind) {
     var src = mediaUrl(kind);
-    var video = $('playerVideo'), hint = $('playerHint'), dialog = $('playerDialog');
+    var video = $('playerVideo'), embed = $('playerEmbed'), hint = $('playerHint'), dialog = $('playerDialog');
     video.pause(); video.removeAttribute('src'); video.load();
-    if (src) {
-      hint.hidden = true; video.hidden = false; video.src = src; video.load();
+    embed.hidden = true; embed.removeAttribute('src');
+    var embedSrc = src ? providerEmbedUrl(src) : '';
+    var directVideo = src && !embedSrc && isDirectVideoFile(src);
+    if (embedSrc || directVideo) {
       dialog.showModal();
-      var promise = video.play();
-      if (promise && promise.catch) promise.catch(function () {});
+      hint.hidden = true;
+      if (embedSrc) {
+        video.hidden = true;
+        embed.hidden = false;
+        embed.src = embedSrc;
+      } else {
+        embed.hidden = true;
+        video.hidden = false; video.src = src; video.load();
+        var promise = video.play();
+        if (promise && promise.catch) promise.catch(function () {});
+      }
     } else {
-      video.hidden = true; hint.hidden = false;
-      hint.textContent = kind === 'trailer'
-        ? 'Трейлер пока не добавлен. Положите видео в assets/videos/trailers и укажите путь в media-config.js.'
-        : 'Видео пока не добавлено. Положите файл в assets/videos и укажите путь к нему в media-config.js.';
+      video.hidden = true; embed.hidden = true; hint.hidden = false;
+      hint.textContent = src
+        ? 'Ссылка не поддерживается. Используйте адрес плеера VK Видео или RUTUBE либо файл MP4.'
+        : (kind === 'trailer'
+          ? 'Трейлер пока не добавлен. Вставьте ссылку VK Видео или RUTUBE в media-config.js.'
+          : 'Видео пока не добавлено. Положите MP4 в assets/videos и укажите путь к нему в media-config.js.');
       dialog.showModal();
     }
   }
@@ -209,8 +297,10 @@
   $('playerDialog').addEventListener('click', function (e) {
     if (e.target === $('playerDialog')) $('playerDialog').close();
   });
-  $('playerDialog').addEventListener('close', function () { $('playerVideo').pause(); });
-
+  $('playerDialog').addEventListener('close', function () {
+    $('playerVideo').pause();
+    $('playerEmbed').removeAttribute('src');
+  });
   /* ---------- routing ---------- */
   var current = 'home';
   function route() {
@@ -224,6 +314,12 @@
     var sid = h === 'contacts' ? 'new' : h;
     document.body.classList.toggle('movie-active', sid === 'movie');
     if (sid === 'movie') setMovieScreen();
+    if (sid === 'episodes' && currentMedia.item && currentMedia.type !== 'film') {
+      $('episodesKind').textContent = currentMedia.type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
+      $('episodesTitle').textContent = currentMedia.item.title;
+      $('episodesTitle').nextElementSibling.textContent = currentMedia.item.description ? currentMedia.item.description + ' Выберите сезон и серию.' : 'Выберите сезон и серию.';
+      renderEpisodes(currentMedia.season || 1);
+    }
     var changed = sid !== current;
     if (changed) {
       document.querySelectorAll('[data-screen]').forEach(function (s) { s.hidden = s.id !== sid; });
@@ -236,20 +332,22 @@
     });
     if (h === 'contacts') requestAnimationFrame(function () { $('contacts-block').scrollIntoView({ behavior:reduce ? 'auto' : 'smooth', block:'start' }); });
     else if (!changed) window.scrollTo({ top:0, behavior:reduce ? 'auto' : 'smooth' });
-    autoplay(sid === 'new');
+    autoplay(sid === 'new' && !$('catalogSearch').value.trim());
   }
   window.addEventListener('hashchange', route);
 
   /* ---------- catalog shelves and search ---------- */
   function cardMarkup(type, item, index) {
     var poster = posterPath(type, item);
-    return '<button class="card rise" style="--d:' + (index + 1) + '" type="button" data-open-item data-item-type="' + type + '" data-item-id="' + item.id + '" data-search="' + safeText(item.title + ' ' + item.meta) + '"><div class="poster" style="--h:' + item.hue + '"><img class="poster-image" src="' + safeText(poster) + '" alt="" onerror="this.hidden=true" loading="lazy">' + icon + '<span>постер</span></div><b>' + safeText(item.title) + '</b><em>' + safeText(item.meta) + '</em></button>';
+    var kind = type === 'anime' ? 'аниме' : type === 'series' ? 'сериал' : 'фильм';
+    var searchable = [item.title, item.meta, item.genre, item.description, kind].join(' ');
+    return '<button class="card rise" style="--d:' + (index + 1) + '" type="button" data-open-item data-item-type="' + type + '" data-item-id="' + item.id + '" data-search="' + safeText(searchable) + '"><div class="poster" style="--h:' + item.hue + '"><img class="poster-image" src="' + safeText(poster) + '" alt="" onerror="this.hidden=true" loading="lazy">' + icon + '<span>постер</span></div><b>' + safeText(item.title) + '</b><em>' + safeText(item.meta) + '</em></button>';
   }
   document.querySelectorAll('[data-shelf]').forEach(function (el, n) {
     var type = el.dataset.shelf === '2' ? 'series' : el.dataset.shelf === '3' ? 'anime' : 'film';
     var list = catalog[type];
     var html = '';
-    for (var i = 0; i < 5; i++) html += cardMarkup(type, list[(i + n) % list.length], i);
+    for (var i = 0; i < list.length; i++) html += cardMarkup(type, list[(i + n) % list.length], i);
     el.innerHTML = html;
   });
   document.addEventListener('click', function (e) {
@@ -257,6 +355,7 @@
     if (!ep) return;
     currentMedia.episode = { id:ep.dataset.episodePlay, number:+ep.dataset.episodePlay.slice(-2), label:'Серия ' + (+ep.dataset.episodePlay.slice(-2)), description:'' };
     currentMedia.season = +ep.dataset.episodePlay.slice(1,3);
+    rememberMedia();
     location.hash = '#movie';
   });
   document.addEventListener('click', function (e) {
@@ -267,6 +366,7 @@
     var type = c.dataset.itemType, item = findItem(type, c.dataset.itemId);
     if (type === 'film') {
       currentMedia = { type:type, item:item, episode:null, season:1 };
+      rememberMedia();
       location.hash = '#movie';
     } else openEpisodes(type, item);
   });
@@ -274,16 +374,21 @@
   $('catalogSearch').addEventListener('input', function () {
     var q = this.value.trim().toLocaleLowerCase('ru');
     var visible = 0;
-    document.querySelectorAll('#new [data-open-item]').forEach(function (card) {
-      var match = !q || card.dataset.search.toLocaleLowerCase('ru').indexOf(q) >= 0;
+    document.querySelectorAll('#new .collection-row .card[data-open-item]').forEach(function (card) {
+      var haystack = (card.dataset.search || card.textContent).toLocaleLowerCase('ru');
+      var match = !q || haystack.indexOf(q) >= 0;
       card.hidden = !match;
       if (match) visible++;
     });
-    document.querySelectorAll('[data-collection]').forEach(function (row) {
-      row.hidden = !!q && !row.querySelector('[data-open-item]:not([hidden])');
+    document.querySelectorAll('#new [data-collection]').forEach(function (row) {
+      row.hidden = !!q && !row.querySelector('.card[data-open-item]:not([hidden])');
     });
+    $('stage').hidden = !!q;
+    $('dots').hidden = !!q;
+    $('count').hidden = !!q;
     $('clearSearch').hidden = !q;
     $('searchStatus').textContent = q ? (visible ? 'Найдено карточек: ' + visible : 'Ничего не найдено') : 'Поиск по каталогу';
+    autoplay(current === 'new' && !q);
   });
   $('clearSearch').addEventListener('click', function () {
     $('catalogSearch').value = '';
@@ -292,12 +397,18 @@
   });
 
   /* ---------- carousel ---------- */
-  var N = 5, cur = 0, paused = false, timer = null;
+  var featuredFilms = films.slice(0, 5);
+  var N = Math.min(5, featuredFilms.length), cur = 0, paused = false, timer = null;
   var track = $('track'), dotsEl = $('dots'), slides = [], dots = [];
   for (var i = 0; i < N; i++) {
-    var f = films[i], s = document.createElement('div');
+    var f = featuredFilms[i], s = document.createElement('div');
+    var still = (assets.frames || {})[f.id] || (assets.posters || {})[f.id] || '';
     s.className = 'slide'; s.dataset.i = i; s.style.setProperty('--h', f.hue);
-    s.innerHTML = '<div class="frame">' + icon + '<b>Главное</b><em>' + safeText(f.title + ' · ' + f.meta) + '</em><a class="btn primary go" href="#movie" tabindex="-1" data-open-item data-item-type="film" data-item-id="' + f.id + '">Смотреть</a></div>';
+    if (still) {
+      s.classList.add('has-still');
+      s.style.setProperty('--slide-image', 'url("' + still + '")');
+    }
+    s.innerHTML = '<div class="frame">' + icon + '<b>' + safeText(f.title) + '</b><em>' + safeText(f.meta) + '</em><a class="btn primary go" href="#movie" tabindex="-1" data-open-item data-item-type="film" data-item-id="' + f.id + '">Смотреть</a></div>';
     track.appendChild(s); slides.push(s);
     var d = document.createElement('button');
     d.type = 'button'; d.dataset.i = i; d.setAttribute('aria-label', 'Слайд ' + (i + 1));
@@ -332,7 +443,7 @@
   $('stage').addEventListener('focusin', function () { paused = true; });
   $('stage').addEventListener('focusout', function () { paused = false; });
   document.addEventListener('keydown', function (e) {
-    if (current !== 'new' || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    if (current !== 'new' || $('catalogSearch').value.trim() || /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
     if (e.key === 'ArrowLeft') go(cur - 1);
     if (e.key === 'ArrowRight') go(cur + 1);
   });
@@ -362,5 +473,6 @@
   setLogo();
   applyAuth();
   setMode(authed || read('user') ? 'login' : 'reg');
+  restoreMedia();
   route();
 })();

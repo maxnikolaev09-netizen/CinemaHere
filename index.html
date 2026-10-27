@@ -8,11 +8,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<script src="media-config.js"></script>
-<script src="app.js" defer></script>
+<link rel="stylesheet" href="styles.css?v=5">
+<script src="media-config.js?v=2"></script>
+<script src="app.js?v=5" defer></script>
 </head>
 <body>
+<div class="dust-field" aria-hidden="true">
+  <i style="left:3.5%;top:12%;--dot:3px;--float-time:23s;--wait:-8s"></i>
+  <i style="left:8.5%;top:29%;--dot:2px;--float-time:31s;--wait:-17s"></i>
+  <i style="left:4.8%;top:47%;--dot:4px;--float-time:27s;--wait:-11s"></i>
+  <i style="left:10.5%;top:68%;--dot:2.5px;--float-time:34s;--wait:-5s"></i>
+  <i style="left:5.3%;top:86%;--dot:3.5px;--float-time:25s;--wait:-19s"></i>
+  <i style="left:1.8%;top:96%;--dot:2px;--float-time:29s;--wait:-13s"></i>
+  <i style="right:3.1%;top:18%;--dot:3.5px;--float-time:30s;--wait:-15s"></i>
+  <i style="right:8.2%;top:37%;--dot:2.5px;--float-time:22s;--wait:-7s"></i>
+  <i style="right:4.7%;top:57%;--dot:4px;--float-time:33s;--wait:-21s"></i>
+  <i style="right:10%;top:76%;--dot:2px;--float-time:26s;--wait:-10s"></i>
+  <i style="right:5.5%;top:92%;--dot:3px;--float-time:35s;--wait:-18s"></i>
+  <i style="right:1.6%;top:5%;--dot:2.5px;--float-time:24s;--wait:-3s"></i>
+</div>
 <header class="top">
   <div class="wrap">
     <a class="logo" href="#new"><img class="logo-image" id="siteLogoImage" src="assets/logo/cinemahere.svg" alt="" onerror="this.hidden=true"><span>CinemaHere</span></a>
@@ -58,12 +72,10 @@
           <a class="btn primary wide" href="#new">Перейти к главному</a>
         </div>
       </div>
-      <div class="hero-right">
-        <span class="eyebrow rise" style="--d:3">Сейчас смотрят</span>
-        <h2 class="rise" style="--d:4">Популярный фильм</h2>
-        <div class="poster rise" style="--h:215;--d:5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg><span>постер</span></div>
-        <p class="rise" style="--d:6">Короткое описание фильма появится здесь. Жанр, год и главные роли.</p>
-        <div class="row rise" style="--d:7"><a class="btn primary" href="#movie" data-needs-auth>Смотреть</a></div>
+      <div class="hero-right" aria-label="Постер аниме «Киберпанк: Бегущие по краю»">
+        <a class="hero-poster-link" href="#episodes" data-open-item data-item-type="anime" data-item-id="anime-1" aria-label="Открыть «Киберпанк: Бегущие по краю»">
+          <img class="hero-register-poster" src="assets/posters/4.avif" alt="Постер аниме «Киберпанк: Бегущие по краю»" fetchpriority="high">
+        </a>
       </div>
     </div>
 
@@ -115,7 +127,7 @@
   <div class="wrap">
     <a class="back-link rise" href="#new">← К главному</a>
     <div class="banner rise" style="--d:1">
-      <div class="back" id="movieFrameCaption">кадр из фильма</div>
+      <div class="back" id="movieFrameCaption" aria-hidden="true"></div>
       <div class="movie-body">
         <div class="poster movie-poster rise" id="moviePoster" style="--h:210;--d:3"><img id="moviePosterImage" class="poster-image" alt="" hidden onerror="this.hidden=true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg><span>постер</span></div>
         <div class="movie-info">
@@ -164,6 +176,6 @@
 
 <footer><div class="wrap"><span>CinemaHere · Онлайн-кинотеатр</span><span>Постеры и кадры меняются в папке assets</span></div></footer>
 <div class="toast" id="toast" aria-live="polite"><div id="toasttext"></div></div>
-<dialog class="player-dialog" id="playerDialog"><button class="player-close" id="playerClose" type="button" aria-label="Закрыть">×</button><video id="playerVideo" controls playsinline preload="metadata" hidden></video><div id="playerHint" class="player-hint"></div></dialog>
+<dialog class="player-dialog" id="playerDialog"><button class="player-close" id="playerClose" type="button" aria-label="Закрыть">×</button><video id="playerVideo" controls playsinline preload="metadata" hidden></video><iframe id="playerEmbed" title="Видеоплеер" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen hidden></iframe><div id="playerHint" class="player-hint" hidden></div></dialog>
 </body>
 </html>
