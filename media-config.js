@@ -2,15 +2,15 @@
 window.CINEMAHERE_ASSETS = {
   logo: "assets/logo/cinemahere.svg",
   posters: {
-    "film-1": "assets/posters/film-1.webp", "film-2": "assets/posters/film-2.webp",
-    "film-3": "assets/posters/film-3.webp", "film-4": "assets/posters/film-4.webp",
-    "film-5": "assets/posters/film-5.webp", "film-6": "assets/posters/film-6.webp",
-    "series-1": "assets/posters/series-1.webp", "series-2": "assets/posters/series-2.webp",
-    "series-3": "assets/posters/series-3.webp", "series-4": "assets/posters/series-4.webp",
-    "series-5": "assets/posters/series-5.webp", "series-6": "assets/posters/series-6.webp",
-    "anime-1": "assets/posters/anime-1.webp", "anime-2": "assets/posters/anime-2.webp",
-    "anime-3": "assets/posters/anime-3.webp", "anime-4": "assets/posters/anime-4.webp",
-    "anime-5": "assets/posters/anime-5.webp", "anime-6": "assets/posters/anime-6.webp"
+    "film-1": "assets/posters/1.webp", "film-2": "assets/posters/13.jpg",
+    "film-3": "assets/posters/5.jpg", "film-4": "assets/posters/15.webp",
+    "film-5": "assets/posters/6.webp", "film-6": "assets/posters/17.webp",
+    "series-1": "assets/posters/2.webp", "series-2": "assets/posters/14.webp",
+    "series-3": "assets/posters/7.jpg", "series-4": "assets/posters/21.jpg",
+    "series-5": "assets/posters/8.jpg", "series-6": "assets/posters/20.jpg",
+    "anime-1": "assets/posters/4.avif", "anime-2": "assets/posters/11.jpg",
+    "anime-3": "assets/posters/9.jpg", "anime-4": "assets/posters/12.jpg",
+    "anime-5": "assets/posters/10.jpg", "anime-6": "assets/posters/22.jpg"
   },
   episodes: {
     /* "series/series-1/s01e01": "assets/episodes/series/series-1/s01e01.webp" */
