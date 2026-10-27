@@ -45,7 +45,7 @@ window.CINEMAHERE_ASSETS = {
   Ссылки на трейлеры:
   - VK Видео: значение src из кода iframe (video_ext.php).
   - RUTUBE: ссылка rutube.ru/play/embed/ID или страница rutube.ru/video/ID.
-  Сейчас подключены трейлеры к 5 фильмам, 6 сериалам и 1 аниме.
+  Сейчас подключены трейлеры к 6 фильмам, 6 сериалам и 2 аниме.
   Пустые поля оставлены, когда подходящий ролик на поддерживаемой площадке не удалось подтвердить.
   Ссылки на полные видео указываются через movie или episodes (см. README.md).
 */
@@ -56,7 +56,7 @@ window.CINEMAHERE_MEDIA = {
     "film-3": { trailer: "https://rutube.ru/video/0406f7c38f6a0e8511de3ab893d59189/" },
     "film-4": { trailer: "https://rutube.ru/video/f1f999e698674de1b6ddb1b71b8aa308/" },
     "film-5": { trailer: "https://rutube.ru/video/b4875ee9b7bf0601927b4cf85d1a777c/" },
-    "film-6": { trailer: "" }
+    "film-6": { trailer: "https://rutube.ru/video/f85c5101d43fbf83e85ee6e85082d4a0/" }
   },
   series: {
     "series-1": { trailer: "https://rutube.ru/video/acc893f460b1711c0f27dc1c076040f9/" },
@@ -68,7 +68,7 @@ window.CINEMAHERE_MEDIA = {
   },
   anime: {
     "anime-1": { trailer: "https://rutube.ru/video/972f6f9c662861b0655930ceacd723a5/" },
-    "anime-2": { trailer: "" },
+    "anime-2": { trailer: "https://rutube.ru/video/dbe0f3bf1aab168ab4d7d207f7321f05/" },
     "anime-3": { trailer: "" },
     "anime-4": { trailer: "" },
     "anime-5": { trailer: "" },
