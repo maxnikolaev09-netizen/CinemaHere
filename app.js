@@ -46,13 +46,91 @@
     if (img) img.src = assets.logo || 'assets/logo/cinemahere.svg';
   }
 
-  /* ---------- storage (demo only; registration is local to this browser) ---------- */
+  /* ---------- local preferences and shared account service ---------- */
   var mem = { user:null, session:null };
   function read(k) { try { var v = localStorage.getItem('kino_' + k); if (v !== null) return v; } catch (e) {} return mem[k]; }
   function write(k, v) { mem[k] = v; try { if (v === null) localStorage.removeItem('kino_' + k); else localStorage.setItem('kino_' + k, v); } catch (e) {} }
-  function hash(s) { var h = 5381; for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return String(h); }
-  var session = read('session');
-  var authed = !!session;
+  var authConfig = window.CINEMAHERE_SUPABASE || {};
+  var authBase = String(authConfig.url || '').trim().replace(/\/+$/, '');
+  var authKey = String(authConfig.anonKey || '').trim();
+  var backendConfigured = /^https?:\/\//i.test(authBase) && authKey && authBase.indexOf('ВСТАВЬТЕ_') < 0 && authKey.indexOf('ВСТАВЬТЕ_') < 0;
+  var session = null;
+  var authed = false;
+
+  function backendRequest(path, options, token) {
+    options = options || {};
+    var headers = Object.assign({}, options.headers || {}, { apikey:authKey });
+    if (token) headers.Authorization = 'Bearer ' + token;
+    else delete headers.Authorization;
+    if (options.body && !headers['Content-Type']) headers['Content-Type'] = 'application/json';
+    return fetch(authBase + path, Object.assign({}, options, { headers:headers })).then(function (response) {
+      return response.text().then(function (raw) {
+        var data = null;
+        try { data = raw ? JSON.parse(raw) : null; } catch (e) { data = { message:raw }; }
+        if (!response.ok) {
+          var error = new Error((data && (data.msg || data.message || data.error_description || data.error)) || 'Запрос не выполнен.');
+          error.status = response.status;
+          throw error;
+        }
+        return data;
+      });
+    });
+  }
+  function saveSession(value) {
+    session = value;
+    authed = !!(session && session.access_token && session.user);
+    write('authSession', session ? JSON.stringify(session) : null);
+  }
+  function sessionFromResponse(data) {
+    if (!data || !data.access_token || !data.refresh_token) return null;
+    return {
+      access_token:data.access_token,
+      refresh_token:data.refresh_token,
+      token_type:data.token_type || 'bearer',
+      expires_at:data.expires_at || (Math.floor(Date.now() / 1000) + (+data.expires_in || 3600)),
+      user:data.user || null
+    };
+  }
+  async function refreshSession() {
+    if (!session || !session.refresh_token) throw new Error('Сеанс завершён. Войдите ещё раз.');
+    var data = await backendRequest('/auth/v1/token?grant_type=refresh_token', {
+      method:'POST', body:JSON.stringify({ refresh_token:session.refresh_token })
+    });
+    var refreshed = sessionFromResponse(data);
+    if (!refreshed) throw new Error('Не удалось обновить сеанс. Войдите ещё раз.');
+    saveSession(refreshed);
+    return session.access_token;
+  }
+  async function accessToken() {
+    if (!session || !session.access_token) throw new Error('Сначала войдите в аккаунт.');
+    if (+session.expires_at * 1000 < Date.now() + 60000) await refreshSession();
+    return session.access_token;
+  }
+  async function restoreAuth() {
+    var callback = new URLSearchParams(location.hash.replace(/^#/, ''));
+    var callbackToken = callback.get('access_token');
+    var callbackRefresh = callback.get('refresh_token');
+    if (callbackToken && callbackRefresh) {
+      session = {
+        access_token:callbackToken,
+        refresh_token:callbackRefresh,
+        token_type:callback.get('token_type') || 'bearer',
+        expires_at:+callback.get('expires_at') || (Math.floor(Date.now() / 1000) + (+callback.get('expires_in') || 3600)),
+        user:null
+      };
+      var confirmedUser = await backendRequest('/auth/v1/user', { method:'GET' }, callbackToken);
+      session.user = confirmedUser;
+      saveSession(session);
+      history.replaceState(null, '', location.pathname + location.search + '#new');
+    } else {
+      try { session = JSON.parse(read('authSession') || 'null'); } catch (e) { session = null; }
+      if (session && session.access_token && session.refresh_token) {
+        if (+session.expires_at * 1000 < Date.now() + 60000) await refreshSession();
+        if (!session.user) session.user = await backendRequest('/auth/v1/user', { method:'GET' }, session.access_token);
+        saveSession(session);
+      } else saveSession(null);
+    }
+  }
 
   /* ---------- toast ---------- */
   var tt;
@@ -70,13 +148,20 @@
     $('welcome').hidden = !authed;
     $('homestrip').hidden = !authed;
     $('acct').hidden = !authed;
-    if (authed) { $('acctmail').textContent = session; $('welcomemail').textContent = session; }
+    if (authed) {
+      var email = session.user.email || '';
+      var name = (session.user.user_metadata && session.user.user_metadata.display_name) || email.split('@')[0] || 'Зритель';
+      $('acctmail').textContent = name;
+      $('acctmail').title = email;
+      $('welcomemail').textContent = name + (email ? ' · ' + email : '');
+    }
   }
   var mode = 'reg';
   function setMode(m) {
     mode = m;
     document.querySelectorAll('.seg button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.mode === m ? 'true' : 'false'); });
     $('pw2wrap').style.display = m === 'reg' ? 'grid' : 'none';
+    $('displayNameWrap').hidden = m !== 'reg';
     $('signbtn').textContent = m === 'reg' ? 'Регистрация' : 'Войти';
     $('pw').autocomplete = m === 'reg' ? 'new-password' : 'current-password';
     $('signmsg').textContent = '';
@@ -86,29 +171,78 @@
     if (b) setMode(b.dataset.mode);
   });
   function err(t) { var m = $('signmsg'); m.textContent = t; m.className = 'msg err'; shake($('signup')); }
-  $('signup').addEventListener('submit', function (e) {
+  function authError(error) {
+    var message = String(error && error.message || 'Не удалось выполнить запрос.');
+    if (/already registered|already exists/i.test(message)) return 'Эта почта уже зарегистрирована. Перейдите во вкладку «Вход».';
+    if (/invalid login credentials/i.test(message)) return 'Проверьте почту и пароль.';
+    if (/email not confirmed/i.test(message)) return 'Сначала подтвердите почту по ссылке из письма.';
+    if (/failed to fetch|networkerror|load failed/i.test(message)) return 'Нет соединения с сервисом аккаунтов. Проверьте интернет и настройки подключения.';
+    return message;
+  }
+  function setAuthBusy(busy) {
+    $('signbtn').disabled = busy;
+    document.querySelectorAll('.seg button').forEach(function (button) { button.disabled = busy; });
+    if (busy) $('signbtn').textContent = 'Подождите…';
+    else $('signbtn').textContent = mode === 'reg' ? 'Регистрация' : 'Войти';
+  }
+  function authNotice(message) {
+    $('signmsg').textContent = message;
+    $('signmsg').className = 'msg';
+  }
+  function commentCountLabel(count) {
+    var lastTwo = count % 100, last = count % 10;
+    var noun = lastTwo >= 11 && lastTwo <= 14 ? 'комментариев' : last === 1 ? 'комментарий' : last >= 2 && last <= 4 ? 'комментария' : 'комментариев';
+    return count + ' ' + noun;
+  }
+  $('signup').addEventListener('submit', async function (e) {
     e.preventDefault();
     var em = $('em').value.trim().toLowerCase(), pw = $('pw').value;
     $('signmsg').className = 'msg';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return err('Введите корректную почту.');
-    if (pw.length < 6) return err('Пароль должен быть не короче 6 символов.');
-    if (mode === 'reg') {
-      if (pw !== $('pw2').value) return err('Пароли не совпадают.');
-      write('user', JSON.stringify({ e:em, h:hash(em + pw) }));
-    } else {
-      var u = null;
-      try { u = JSON.parse(read('user')); } catch (x) {}
-      if (!u) return err('Аккаунт не найден. Сначала зарегистрируйтесь.');
-      if (u.e !== em || u.h !== hash(em + pw)) return err('Неверная почта или пароль.');
+    if (pw.length < 8) return err('Пароль должен быть не короче 8 символов.');
+    var isSignup = mode === 'reg';
+    var displayName = $('displayName').value.trim().replace(/\s+/g, ' ');
+    if (isSignup && (displayName.length < 2 || displayName.length > 32)) return err('Имя должно содержать от 2 до 32 символов.');
+    if (isSignup && pw !== $('pw2').value) return err('Пароли не совпадают.');
+    if (!backendConfigured) return err('Сервис аккаунтов ещё не подключён. Заполните supabase-config.js и настройте базу по инструкции в README.md.');
+    setAuthBusy(true);
+    try {
+      var data;
+      if (isSignup) {
+        var redirectTo = location.origin + location.pathname + location.search;
+        var signUpPath = '/auth/v1/signup?redirect_to=' + encodeURIComponent(redirectTo);
+        data = await backendRequest(signUpPath, {
+          method:'POST',
+          body:JSON.stringify({ email:em, password:pw, data:{ display_name:displayName } })
+        });
+      } else {
+        data = await backendRequest('/auth/v1/token?grant_type=password', {
+          method:'POST', body:JSON.stringify({ email:em, password:pw })
+        });
+      }
+      var nextSession = sessionFromResponse(data);
+      if (!nextSession) {
+        $('signup').reset();
+        setMode('login');
+        authNotice('Если адрес новый, подтвердите его по ссылке из письма, затем войдите.');
+        return;
+      }
+      saveSession(nextSession);
+      applyAuth();
+      $('signup').reset();
+      toast(isSignup ? 'Аккаунт создан. Добро пожаловать!' : 'С возвращением!');
+      location.hash = '#new';
+    } catch (error) {
+      err(authError(error));
+    } finally {
+      setAuthBusy(false);
     }
-    session = em; write('session', em); authed = true;
-    applyAuth();
-    toast(mode === 'reg' ? 'Регистрация прошла успешно. Добро пожаловать!' : 'С возвращением!');
-    $('signup').reset();
-    location.hash = '#new';
   });
-  $('logout').addEventListener('click', function () {
-    write('session', null); session = null; authed = false;
+  $('logout').addEventListener('click', async function () {
+    if (session && session.access_token && backendConfigured) {
+      try { await backendRequest('/auth/v1/logout', { method:'POST' }, session.access_token); } catch (e) {}
+    }
+    saveSession(null);
     applyAuth(); setMode('login');
     toast('Вы вышли из аккаунта.');
     location.hash = '#home';
@@ -145,6 +279,115 @@
     var episode = match ? { id:saved.episode, number:+match[2], label:'Серия ' + (+match[2]), description:'' } : null;
     currentMedia = { type:saved.type, item:item, episode:episode, season:season };
   }
+  var commentLoadId = 0;
+  function commentAuthor() {
+    var user = session && session.user;
+    return (user && user.user_metadata && user.user_metadata.display_name) || (user && user.email ? user.email.split('@')[0] : 'Зритель');
+  }
+  function commentStatus(message, isError) {
+    var status = $('commentMessage');
+    status.textContent = message || '';
+    status.className = isError ? 'msg err' : 'msg';
+  }
+  function renderCommentRows(rows) {
+    var list = $('commentsList');
+    list.replaceChildren();
+    $('commentCount').textContent = commentCountLabel(rows.length);
+    if (!rows.length) {
+      var empty = document.createElement('p');
+      empty.className = 'comments-empty';
+      empty.textContent = 'Пока никто не оставил комментарий. Будьте первым!';
+      list.appendChild(empty);
+      return;
+    }
+    rows.forEach(function (row) {
+      var card = document.createElement('article');
+      card.className = 'comment-card';
+      var header = document.createElement('div');
+      header.className = 'comment-card-head';
+      var author = document.createElement('b');
+      author.textContent = row.author_name || 'Зритель';
+      var time = document.createElement('time');
+      var date = new Date(row.created_at);
+      time.dateTime = row.created_at || '';
+      time.textContent = Number.isNaN(date.getTime()) ? '' : new Intl.DateTimeFormat('ru-RU', { dateStyle:'medium', timeStyle:'short' }).format(date);
+      var body = document.createElement('p');
+      body.textContent = row.body || '';
+      header.append(author, time);
+      card.append(header, body);
+      list.appendChild(card);
+    });
+  }
+  async function loadComments() {
+    var loadId = ++commentLoadId;
+    var item = currentMedia.item;
+    var type = currentMedia.type;
+    $('commentForm').hidden = !authed || !backendConfigured;
+    $('commentCount').textContent = 'Загрузка…';
+    $('commentsList').replaceChildren();
+    commentStatus('');
+    if (!backendConfigured) {
+      $('commentCount').textContent = 'Не подключено';
+      $('commentsList').textContent = 'Сначала настройте Supabase по инструкции в README.md.';
+      return;
+    }
+    if (!authed || !item) {
+      $('commentCount').textContent = 'Доступ закрыт';
+      $('commentsList').textContent = 'Войдите в аккаунт, чтобы читать и писать комментарии.';
+      return;
+    }
+    try {
+      var params = new URLSearchParams();
+      params.set('select', 'id,item_type,item_id,author_name,body,created_at');
+      params.set('item_type', 'eq.' + type);
+      params.set('item_id', 'eq.' + item.id);
+      params.set('order', 'created_at.desc');
+      params.set('limit', '100');
+      var token = await accessToken();
+      var rows = await backendRequest('/rest/v1/comments?' + params.toString(), { method:'GET' }, token);
+      if (loadId !== commentLoadId) return;
+      renderCommentRows(Array.isArray(rows) ? rows : []);
+    } catch (error) {
+      if (loadId !== commentLoadId) return;
+      $('commentCount').textContent = 'Не удалось загрузить';
+      $('commentsList').textContent = authError(error) + ' Проверьте SQL-схему и политики доступа.';
+    }
+  }
+  $('commentForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var body = $('commentBody').value.trim();
+    if (body.length < 3 || body.length > 1200) return commentStatus('Комментарий должен содержать от 3 до 1200 символов.', true);
+    if (!authed || !session || !session.user) return commentStatus('Войдите в аккаунт, чтобы оставить комментарий.', true);
+    if (!backendConfigured) return commentStatus('Сервис комментариев ещё не подключён.', true);
+    var item = currentMedia.item;
+    var type = currentMedia.type;
+    var submit = $('commentSubmit');
+    submit.disabled = true;
+    submit.textContent = 'Публикуем…';
+    commentStatus('');
+    try {
+      var token = await accessToken();
+      await backendRequest('/rest/v1/comments', {
+        method:'POST',
+        headers:{ Prefer:'return=minimal' },
+        body:JSON.stringify({
+          item_type:type,
+          item_id:item.id,
+          user_id:session.user.id,
+          author_name:commentAuthor(),
+          body:body
+        })
+      }, token);
+      $('commentBody').value = '';
+      if (currentMedia.item && currentMedia.item.id === item.id && currentMedia.type === type) await loadComments();
+      commentStatus('Комментарий опубликован.');
+    } catch (error) {
+      commentStatus(authError(error) + ' Если это сообщение о политике доступа, запустите supabase-comments.sql.', true);
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Опубликовать';
+    }
+  });
   function setMovieScreen() {
     var item = currentMedia.item || films[0], type = currentMedia.type || 'film';
     var title = item.title;
@@ -189,6 +432,7 @@
     $('moviePoster').querySelector('span').textContent = type === 'anime' ? 'постер аниме' : type === 'series' ? 'постер сериала' : 'постер';
     $('movieTitle').parentNode.querySelector('.rating').textContent = item.rating || '4.5';
     $('movieTitle').parentNode.querySelector('.rating').setAttribute('aria-label', 'Рейтинг ' + (item.rating || '4.5'));
+    loadComments();
   }
   function openEpisodes(type, item) {
     currentMedia = { type:type, item:item, episode:null, season:1 };
@@ -327,12 +571,17 @@
     }
     var sid = h === 'contacts' ? 'new' : h;
     document.body.classList.toggle('movie-active', sid === 'movie');
-    if (sid === 'movie') setMovieScreen();
+    if (sid === 'movie') {
+      setMovieScreen();
+      $('movie').querySelector('.wrap').appendChild($('commentsSection'));
+    }
     if (sid === 'episodes' && currentMedia.item && currentMedia.type !== 'film') {
       $('episodesKind').textContent = currentMedia.type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
       $('episodesTitle').textContent = currentMedia.item.title;
       $('episodesTitle').nextElementSibling.textContent = (currentMedia.item.description ? currentMedia.item.description + ' ' : '') + 'Выберите сезон и серию. ' + seasonSummary(currentMedia.type, currentMedia.item);
       renderEpisodes(currentMedia.season || 1);
+      $('episodes').querySelector('.wrap').appendChild($('commentsSection'));
+      loadComments();
     }
     var changed = sid !== current;
     if (changed) {
@@ -349,6 +598,9 @@
     autoplay(sid === 'new' && !$('catalogSearch').value.trim());
   }
   window.addEventListener('hashchange', route);
+  window.addEventListener('focus', function () { if (current === 'movie' || current === 'episodes') loadComments(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && (current === 'movie' || current === 'episodes')) loadComments(); });
+  window.setInterval(function () { if (!document.hidden && (current === 'movie' || current === 'episodes')) loadComments(); }, 30000);
 
   /* ---------- catalog shelves and search ---------- */
   function cardMarkup(type, item, index) {
@@ -484,9 +736,19 @@
     $('paymsg').textContent = sel ? 'Выбран тариф «' + sel.dataset.plan + '». Оплата в демо не подключена.' : 'Сначала выберите тариф.';
   });
 
-  setLogo();
-  applyAuth();
-  setMode(authed || read('user') ? 'login' : 'reg');
-  restoreMedia();
-  route();
+  async function initializeApp() {
+    setLogo();
+    restoreMedia();
+    if (backendConfigured) {
+      try { await restoreAuth(); }
+      catch (error) {
+        saveSession(null);
+        toast('Сеанс завершён. Войдите снова.');
+      }
+    } else saveSession(null);
+    applyAuth();
+    setMode(authed ? 'login' : 'reg');
+    route();
+  }
+  initializeApp();
 })();

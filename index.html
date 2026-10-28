@@ -8,9 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 <script src="media-config.js?v=4"></script>
-<script src="app.js?v=6" defer></script>
+<script src="supabase-config.js?v=1"></script>
+<script src="app.js?v=7" defer></script>
 </head>
 <body>
 <div class="dust-field" aria-hidden="true">
@@ -54,16 +55,21 @@
             <button type="button" role="tab" data-mode="reg" aria-selected="true">Регистрация</button>
             <button type="button" role="tab" data-mode="login" aria-selected="false">Вход</button>
           </div>
+          <div id="displayNameWrap" class="field-wrap">
+            <label for="displayName">Имя на сайте</label>
+            <input id="displayName" type="text" placeholder="Например, Алексей" autocomplete="nickname" maxlength="32">
+          </div>
           <label for="em">Электронная почта</label>
           <input id="em" type="email" placeholder="name@example.ru" autocomplete="email">
           <label for="pw">Пароль</label>
-          <input id="pw" type="password" placeholder="Не короче 6 символов" autocomplete="new-password">
+          <input id="pw" type="password" placeholder="Не короче 8 символов" autocomplete="new-password">
           <div id="pw2wrap" style="display:grid;gap:10px">
             <label for="pw2">Повторите пароль</label>
             <input id="pw2" type="password" placeholder="Ещё раз тот же пароль" autocomplete="new-password">
           </div>
           <button class="btn primary wide" id="signbtn" type="submit">Регистрация</button>
           <div class="msg" id="signmsg" role="status"></div>
+          <p class="auth-note">Аккаунт нужен, чтобы пользоваться каталогом и писать комментарии. Данные аккаунта хранятся в защищённом сервисе авторизации.</p>
         </form>
 
         <div class="welcome rise" id="welcome" hidden>
@@ -140,6 +146,20 @@
         </div>
       </div>
     </div>
+    <section class="comments-section rise" id="commentsSection" aria-labelledby="commentsTitle">
+      <div class="comments-heading">
+        <div><span class="eyebrow">ОБСУЖДЕНИЕ</span><h2 id="commentsTitle">Комментарии</h2></div>
+        <span class="comment-count" id="commentCount">Загрузка…</span>
+      </div>
+      <p class="comments-intro">Поделитесь впечатлением о фильме, сериале или аниме. Комментарии видны всем пользователям сайта.</p>
+      <form class="comment-form" id="commentForm">
+        <label for="commentBody">Ваш комментарий</label>
+        <textarea id="commentBody" rows="4" maxlength="1200" placeholder="Что думаете об этой картине?" required></textarea>
+        <div class="comment-form-bottom"><small>От 3 до 1200 символов</small><button class="btn primary" id="commentSubmit" type="submit">Опубликовать</button></div>
+        <div class="msg" id="commentMessage" role="status"></div>
+      </form>
+      <div class="comments-list" id="commentsList" aria-live="polite"></div>
+    </section>
   </div>
 </section>
 
