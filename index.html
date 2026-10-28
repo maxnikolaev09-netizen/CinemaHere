@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=14">
 <script src="media-config.js?v=4"></script>
 <script src="supabase-config.js?v=1"></script>
-<script src="app.js?v=7" defer></script>
+<script src="app.js?v=9" defer></script>
 </head>
 <body>
 <div class="dust-field" aria-hidden="true">
@@ -33,6 +33,8 @@
     <a class="logo" href="#new"><img class="logo-image" id="siteLogoImage" src="assets/logo/cinemahere.svg" alt="" onerror="this.hidden=true"><span>CinemaHere</span></a>
     <nav class="nav locked" id="nav" aria-label="Разделы">
       <a href="#new" data-p="new">Главное</a>
+      <a href="#clapper" data-p="clapper">Хлопушка</a>
+      <a href="#favorites" data-p="favorites">Избранное <span class="nav-count" id="favoritesCount">0</span></a>
       <a href="#plans" data-p="plans">Подписка</a>
       <a href="#contacts" data-p="contacts">Контакты</a>
     </nav>
@@ -119,6 +121,39 @@
   </div>
 </section>
 
+<!-- FAVORITES -->
+<section class="screen" id="favorites" data-screen hidden>
+  <div class="wrap">
+    <div class="favorites-head rise"><div><span class="eyebrow">ВАША КОЛЛЕКЦИЯ</span><h1>Избранное</h1><p>Фильмы, сериалы и аниме, к которым хочется вернуться.</p></div><span class="favorite-total" id="favoritesTotal">0 позиций</span></div>
+    <p class="favorites-message" id="favoritesMessage" role="status" hidden></p>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+  </div>
+</section>
+
+<!-- CLAPPERBOARD PICKER -->
+<section class="screen" id="clapper" data-screen hidden>
+  <div class="wrap">
+    <a class="back-link rise" href="#new">← К каталогу</a>
+    <div class="clapper-intro rise"><span class="eyebrow">ПОДБОР ПО КАТАЛОГУ</span><h1>Кинохлопушка</h1><p>Выбери формат, жанр и эпоху — хлопушка случайно подберёт картину из CinemaHere.</p></div>
+    <div class="clapperboard rise" id="clapperboard">
+      <div class="clapper-lid" aria-hidden="true"><span class="stripe"></span><span class="stripe"></span><span class="stripe"></span><span class="stripe"></span><span class="stripe"></span><span class="stripe"></span></div>
+      <div class="clapper-title"><span class="clapper-mark">CH</span><div><b>CINEMAHERE · TAKE A CHANCE</b><small>Кадр первый. Настроение — кино.</small></div><span class="clapper-status"><i></i> ГОТОВО К СЪЁМКЕ</span></div>
+      <form class="clapper-form" id="clapperForm">
+        <div class="form-grid">
+          <label class="clapper-field"><span>Что смотрим?</span><select id="clapperType"><option value="all">Любой формат</option><option value="film">Фильм</option><option value="series">Сериал</option><option value="anime">Аниме</option></select></label>
+          <label class="clapper-field"><span>Жанр</span><select id="clapperGenre"><option value="all">Любой жанр</option></select></label>
+          <label class="clapper-field"><span>Эпоха</span><select id="clapperEra"><option value="all">Любой год</option><option value="2020">2020-е</option><option value="2010">2010-е</option><option value="2000">2000-е</option><option value="classic">До 2000 года</option></select></label>
+        </div>
+        <div class="clapper-controls"><p id="clapperMessage" role="status">В подборке участвует весь каталог CinemaHere.</p><button class="btn primary clapper-submit" type="submit"><span aria-hidden="true">▶</span> Хлопнуть и выбрать</button></div>
+      </form>
+      <section class="clapper-result" id="clapperResult" aria-live="polite" hidden>
+        <div class="clapper-result-heading"><div><span class="eyebrow">ВАШ СЛУЧАЙНЫЙ ВЫБОР</span><h2 id="clapperResultTitle">Смотрите сегодня</h2></div><button class="btn small" id="clapperAgain" type="button">Выбрать ещё</button></div>
+        <div id="clapperResultCard"></div>
+      </section>
+    </div>
+  </div>
+</section>
+
 <!-- EPISODES -->
 <section class="screen" id="episodes" data-screen hidden>
   <div class="wrap">
@@ -137,7 +172,7 @@
       <div class="movie-body">
         <div class="poster movie-poster rise" id="moviePoster" style="--h:210;--d:3"><img id="moviePosterImage" class="poster-image" alt="" hidden onerror="this.hidden=true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg><span>постер</span></div>
         <div class="movie-info">
-          <div class="t rise" style="--d:3"><h1 id="movieTitle">Название кино</h1><div class="rating" aria-label="Рейтинг 4.5">4.5</div></div>
+          <div class="t rise" style="--d:3"><h1 id="movieTitle">Название кино</h1><button class="favorite-toggle movie-favorite" id="movieFavorite" type="button" data-favorite-toggle aria-pressed="false" aria-label="Добавить в избранное" title="Добавить в избранное"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg></button><div class="rating" aria-label="Рейтинг 4.5">4.5</div></div>
           <div class="chips rise" style="--d:4"><span id="movieYear">2026</span><span id="movieGenre">Жанр</span><span id="movieDuration">1 ч 54 мин</span><span id="movieAge">16+</span></div>
           <h2 class="rise" style="--d:5">Описание фильма</h2>
           <p class="rise" id="movieDescription" style="--d:6">Здесь будет описание сюжета: о чём фильм, кто главные герои и почему его стоит посмотреть. Текст можно заменить на любой.</p>
@@ -148,14 +183,13 @@
     </div>
     <section class="comments-section rise" id="commentsSection" aria-labelledby="commentsTitle">
       <div class="comments-heading">
-        <div><span class="eyebrow">ОБСУЖДЕНИЕ</span><h2 id="commentsTitle">Комментарии</h2></div>
+        <div class="comments-heading-main"><span class="comments-icon" aria-hidden="true">✦</span><div><span class="eyebrow">ЗРИТЕЛЬСКИЙ ЗАЛ</span><h2 id="commentsTitle">Обсуждение</h2></div></div>
         <span class="comment-count" id="commentCount">Загрузка…</span>
       </div>
       <p class="comments-intro">Поделитесь впечатлением о фильме, сериале или аниме. Комментарии видны всем пользователям сайта.</p>
       <form class="comment-form" id="commentForm">
-        <label for="commentBody">Ваш комментарий</label>
-        <textarea id="commentBody" rows="4" maxlength="1200" placeholder="Что думаете об этой картине?" required></textarea>
-        <div class="comment-form-bottom"><small>От 3 до 1200 символов</small><button class="btn primary" id="commentSubmit" type="submit">Опубликовать</button></div>
+        <div class="comment-composer"><span class="comment-avatar comment-own-avatar" id="commentOwnAvatar">CH</span><label class="visually-hidden" for="commentBody">Ваш комментарий</label><textarea id="commentBody" rows="3" maxlength="1200" placeholder="Поделитесь впечатлением — что зацепило?" required></textarea></div>
+        <div class="comment-form-bottom"><small>От 3 до 1200 символов · Пишите уважительно</small><button class="btn primary" id="commentSubmit" type="submit"><span aria-hidden="true">↗</span> Опубликовать</button></div>
         <div class="msg" id="commentMessage" role="status"></div>
       </form>
       <div class="comments-list" id="commentsList" aria-live="polite"></div>

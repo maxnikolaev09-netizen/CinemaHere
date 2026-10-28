@@ -1,7 +1,7 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var routes = ['home', 'new', 'contacts', 'episodes', 'movie', 'plans'];
+  var routes = ['home', 'new', 'contacts', 'episodes', 'movie', 'favorites', 'clapper', 'plans'];
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var assets = window.CINEMAHERE_ASSETS || {};
   var media = window.CINEMAHERE_MEDIA || { films: {}, series: {}, anime: {} };
@@ -32,6 +32,8 @@
   var catalog = { film:films, series:series, anime:anime };
   var icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/></svg>';
   var currentMedia = { type:'film', item:films[0], episode:null, season:1 };
+  var favoriteMap = {};
+  var favoriteLoadError = '';
 
   function safeText(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
   function assetPath(kind, id, fallback) {
@@ -44,6 +46,111 @@
   function setLogo() {
     var img = $('siteLogoImage');
     if (img) img.src = assets.logo || 'assets/logo/cinemahere.svg';
+  }
+
+  function favoriteKey(type, id) { return type + ':' + id; }
+  function isFavorite(type, id) { return !!favoriteMap[favoriteKey(type, id)]; }
+  function favoriteButtonMarkup(type, item) {
+    var selected = isFavorite(type, item.id);
+    var label = selected ? 'Убрать из избранного' : 'Добавить в избранное';
+    return '<button class="favorite-toggle" type="button" data-favorite-toggle data-item-type="' + type + '" data-item-id="' + safeText(item.id) + '" aria-label="' + label + '" title="' + label + '" aria-pressed="' + (selected ? 'true' : 'false') + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg></button>';
+  }
+  function renderFavorites() {
+    var grid = $('favoritesGrid');
+    if (!grid) return;
+    grid.replaceChildren();
+    var entries = Object.keys(favoriteMap).map(function (key) {
+      var saved = favoriteMap[key], item = saved && findItem(saved.item_type, saved.item_id);
+      return item ? { type:saved.item_type, item:item, created_at:saved.created_at || '' } : null;
+    }).filter(Boolean);
+    entries.sort(function (a, b) { return Date.parse(b.created_at || '') - Date.parse(a.created_at || ''); });
+    $('favoritesTotal').textContent = entries.length + (entries.length === 1 ? ' позиция' : entries.length >= 2 && entries.length <= 4 ? ' позиции' : ' позиций');
+    $('favoritesCount').textContent = String(entries.length);
+    $('favoritesMessage').hidden = !favoriteLoadError;
+    $('favoritesMessage').textContent = favoriteLoadError;
+    if (!entries.length && !favoriteLoadError) {
+      var empty = document.createElement('div');
+      empty.className = 'favorites-empty';
+      empty.innerHTML = '<span class="favorites-empty-mark" aria-hidden="true">♡</span><b>Пока здесь пусто</b><span>Нажимай сердечко на карточке фильма или сериала — он появится в этой подборке.</span><a class="btn primary" href="#new">Открыть каталог</a>';
+      grid.appendChild(empty);
+      return;
+    }
+    entries.forEach(function (entry, index) {
+      var holder = document.createElement('div');
+      holder.innerHTML = cardMarkup(entry.type, entry.item, index);
+      grid.appendChild(holder.firstElementChild);
+    });
+    refreshFavoriteButtons();
+  }
+  function refreshFavoriteButtons() {
+    document.querySelectorAll('[data-favorite-toggle]').forEach(function (button) {
+      var selected = isFavorite(button.dataset.itemType, button.dataset.itemId);
+      var label = selected ? 'Убрать из избранного' : 'Добавить в избранное';
+      button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    });
+    if ($('favoritesCount')) $('favoritesCount').textContent = String(Object.keys(favoriteMap).length);
+  }
+  async function loadFavorites() {
+    favoriteLoadError = '';
+    favoriteMap = {};
+    if (!backendConfigured || !authed) {
+      renderFavorites();
+      refreshFavoriteButtons();
+      return;
+    }
+    try {
+      var token = await accessToken();
+      var params = new URLSearchParams({ select:'item_type,item_id,created_at', order:'created_at.desc' });
+      var rows = await backendRequest('/rest/v1/favorites?' + params.toString(), { method:'GET' }, token);
+      favoriteMap = {};
+      (Array.isArray(rows) ? rows : []).forEach(function (row) {
+        favoriteMap[favoriteKey(row.item_type, row.item_id)] = row;
+      });
+    } catch (error) {
+      favoriteLoadError = 'Не удалось загрузить избранное. Запусти supabase-favorites.sql в SQL Editor и проверь подключение.';
+    }
+    renderFavorites();
+    refreshFavoriteButtons();
+  }
+  async function toggleFavorite(type, id) {
+    if (!authed) return gate();
+    if (!backendConfigured) return toast('Сначала подключи Supabase.');
+    var key = favoriteKey(type, id), old = favoriteMap[key] || null, adding = !old;
+    var buttons = Array.from(document.querySelectorAll('[data-favorite-toggle]')).filter(function (button) {
+      return button.dataset.itemType === type && button.dataset.itemId === id;
+    });
+    buttons.forEach(function (button) { button.disabled = true; });
+    if (adding) favoriteMap[key] = { item_type:type, item_id:id, created_at:new Date().toISOString() };
+    else delete favoriteMap[key];
+    renderFavorites();
+    refreshFavoriteButtons();
+    try {
+      var token = await accessToken();
+      if (adding) {
+        await backendRequest('/rest/v1/favorites', {
+          method:'POST', headers:{ Prefer:'return=minimal' },
+          body:JSON.stringify({ user_id:session.user.id, item_type:type, item_id:id })
+        }, token);
+        toast('Добавлено в избранное.');
+      } else {
+        var params = new URLSearchParams({ user_id:'eq.' + session.user.id, item_type:'eq.' + type, item_id:'eq.' + id });
+        await backendRequest('/rest/v1/favorites?' + params.toString(), { method:'DELETE' }, token);
+        toast('Убрано из избранного.');
+      }
+      favoriteLoadError = '';
+    } catch (error) {
+      if (old) favoriteMap[key] = old; else delete favoriteMap[key];
+      favoriteLoadError = 'Избранное не подключено. Запусти supabase-favorites.sql в Supabase.';
+      toast(favoriteLoadError);
+    } finally {
+      renderFavorites();
+      refreshFavoriteButtons();
+      document.querySelectorAll('[data-favorite-toggle]').forEach(function (button) {
+        if (button.dataset.itemType === type && button.dataset.itemId === id) button.disabled = false;
+      });
+    }
   }
 
   /* ---------- local preferences and shared account service ---------- */
@@ -154,6 +261,7 @@
       $('acctmail').textContent = name;
       $('acctmail').title = email;
       $('welcomemail').textContent = name + (email ? ' · ' + email : '');
+      if ($('commentOwnAvatar')) $('commentOwnAvatar').textContent = name.split(/\s+/).slice(0,2).map(function (part) { return part.charAt(0); }).join('').toLocaleUpperCase('ru');
     }
   }
   var mode = 'reg';
@@ -228,6 +336,7 @@
         return;
       }
       saveSession(nextSession);
+      await loadFavorites();
       applyAuth();
       $('signup').reset();
       toast(isSignup ? 'Аккаунт создан. Добро пожаловать!' : 'С возвращением!');
@@ -243,6 +352,9 @@
       try { await backendRequest('/auth/v1/logout', { method:'POST' }, session.access_token); } catch (e) {}
     }
     saveSession(null);
+    favoriteMap = {};
+    favoriteLoadError = '';
+    renderFavorites();
     applyAuth(); setMode('login');
     toast('Вы вышли из аккаунта.');
     location.hash = '#home';
@@ -303,6 +415,12 @@
     rows.forEach(function (row) {
       var card = document.createElement('article');
       card.className = 'comment-card';
+      var avatar = document.createElement('span');
+      avatar.className = 'comment-avatar';
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.textContent = String(row.author_name || 'Зритель').trim().split(/\s+/).slice(0,2).map(function (part) { return part.charAt(0); }).join('').toLocaleUpperCase('ru');
+      var content = document.createElement('div');
+      content.className = 'comment-content';
       var header = document.createElement('div');
       header.className = 'comment-card-head';
       var author = document.createElement('b');
@@ -314,7 +432,8 @@
       var body = document.createElement('p');
       body.textContent = row.body || '';
       header.append(author, time);
-      card.append(header, body);
+      content.append(header, body);
+      card.append(avatar, content);
       list.appendChild(card);
     });
   }
@@ -432,6 +551,9 @@
     $('moviePoster').querySelector('span').textContent = type === 'anime' ? 'постер аниме' : type === 'series' ? 'постер сериала' : 'постер';
     $('movieTitle').parentNode.querySelector('.rating').textContent = item.rating || '4.5';
     $('movieTitle').parentNode.querySelector('.rating').setAttribute('aria-label', 'Рейтинг ' + (item.rating || '4.5'));
+    $('movieFavorite').dataset.itemType = type;
+    $('movieFavorite').dataset.itemId = item.id;
+    refreshFavoriteButtons();
     loadComments();
   }
   function openEpisodes(type, item) {
@@ -575,6 +697,7 @@
       setMovieScreen();
       $('movie').querySelector('.wrap').appendChild($('commentsSection'));
     }
+    if (sid === 'favorites') loadFavorites();
     if (sid === 'episodes' && currentMedia.item && currentMedia.type !== 'film') {
       $('episodesKind').textContent = currentMedia.type === 'anime' ? 'АНИМЕ' : 'СЕРИАЛ';
       $('episodesTitle').textContent = currentMedia.item.title;
@@ -607,7 +730,7 @@
     var poster = posterPath(type, item);
     var kind = type === 'anime' ? 'аниме' : type === 'series' ? 'сериал' : 'фильм';
     var searchable = [item.title, item.meta, item.genre, item.description, kind].join(' ');
-    return '<button class="card rise" style="--d:' + (index + 1) + '" type="button" data-open-item data-item-type="' + type + '" data-item-id="' + item.id + '" data-search="' + safeText(searchable) + '"><div class="poster" style="--h:' + item.hue + '"><img class="poster-image" src="' + safeText(poster) + '" alt="" onerror="this.hidden=true" loading="lazy">' + icon + '<span>постер</span></div><b>' + safeText(item.title) + '</b><em>' + safeText(item.meta) + '</em></button>';
+    return '<article class="card rise" style="--d:' + (index + 1) + '" data-item-type="' + type + '" data-item-id="' + safeText(item.id) + '" data-search="' + safeText(searchable) + '"><button class="card-open" type="button" data-open-item data-item-type="' + type + '" data-item-id="' + safeText(item.id) + '"><div class="poster" style="--h:' + item.hue + '"><img class="poster-image" src="' + safeText(poster) + '" alt="" onerror="this.hidden=true" loading="lazy">' + icon + '<span>постер</span></div><b>' + safeText(item.title) + '</b><em>' + safeText(item.meta) + '</em></button>' + favoriteButtonMarkup(type, item) + '</article>';
   }
   document.querySelectorAll('[data-shelf]').forEach(function (el, n) {
     var type = el.dataset.shelf === '2' ? 'series' : el.dataset.shelf === '3' ? 'anime' : 'film';
@@ -615,6 +738,13 @@
     var html = '';
     for (var i = 0; i < list.length; i++) html += cardMarkup(type, list[(i + n) % list.length], i);
     el.innerHTML = html;
+  });
+  document.addEventListener('click', function (e) {
+    var favorite = e.target.closest('[data-favorite-toggle]');
+    if (!favorite) return;
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavorite(favorite.dataset.itemType, favorite.dataset.itemId);
   });
   document.addEventListener('click', function (e) {
     var ep = e.target.closest('[data-episode-play]');
@@ -640,14 +770,14 @@
   $('catalogSearch').addEventListener('input', function () {
     var q = this.value.trim().toLocaleLowerCase('ru');
     var visible = 0;
-    document.querySelectorAll('#new .collection-row .card[data-open-item]').forEach(function (card) {
+    document.querySelectorAll('#new .collection-row .card[data-item-id]').forEach(function (card) {
       var haystack = (card.dataset.search || card.textContent).toLocaleLowerCase('ru');
       var match = !q || haystack.indexOf(q) >= 0;
       card.hidden = !match;
       if (match) visible++;
     });
     document.querySelectorAll('#new [data-collection]').forEach(function (row) {
-      row.hidden = !!q && !row.querySelector('.card[data-open-item]:not([hidden])');
+      row.hidden = !!q && !row.querySelector('.card[data-item-id]:not([hidden])');
     });
     $('stage').hidden = !!q;
     $('dots').hidden = !!q;
@@ -661,6 +791,64 @@
     $('catalogSearch').dispatchEvent(new Event('input'));
     $('catalogSearch').focus();
   });
+
+  /* ---------- catalog-powered clapperboard ---------- */
+  var genreOptions = {};
+  Object.keys(catalog).forEach(function (type) {
+    catalog[type].forEach(function (item) {
+      String(item.genre || '').split(',').forEach(function (genre) {
+        genre = genre.trim();
+        if (genre && genre.toLocaleLowerCase('ru') !== 'аниме') genreOptions[genre.toLocaleLowerCase('ru')] = genre;
+      });
+    });
+  });
+  Object.keys(genreOptions).sort(function (a, b) { return genreOptions[a].localeCompare(genreOptions[b], 'ru'); }).forEach(function (key) {
+    var option = document.createElement('option');
+    option.value = key;
+    option.textContent = genreOptions[key];
+    $('clapperGenre').appendChild(option);
+  });
+  function itemYear(item) { return parseInt(item.year || String(item.meta || '').match(/\b(?:19|20)\d{2}\b/) || 0, 10) || 0; }
+  var clapperTimer = null, lastClapperKey = '';
+  function runClapper() {
+    var type = $('clapperType').value;
+    var genre = $('clapperGenre').value;
+    var era = $('clapperEra').value;
+    var options = [];
+    Object.keys(catalog).forEach(function (kind) {
+      if (type !== 'all' && kind !== type) return;
+      catalog[kind].forEach(function (item) {
+        var year = itemYear(item);
+        var genreMatch = genre === 'all' || String(item.genre || '').toLocaleLowerCase('ru').indexOf(genre) >= 0;
+        var eraMatch = era === 'all' || (era === 'classic' ? year > 0 && year < 2000 : year >= +era && year < +era + 10);
+        if (genreMatch && eraMatch) options.push({ type:kind, item:item });
+      });
+    });
+    var candidates = options.filter(function (entry) { return favoriteKey(entry.type, entry.item.id) !== lastClapperKey; });
+    if (candidates.length) options = candidates;
+    var pick = options.length ? options[Math.floor(Math.random() * options.length)] : null;
+    if (pick) lastClapperKey = favoriteKey(pick.type, pick.item.id);
+    var board = $('clapperboard');
+    board.classList.remove('clapping');
+    void board.offsetWidth;
+    board.classList.add('clapping');
+    $('clapperMessage').textContent = options.length ? 'Подходящих вариантов: ' + options.length + '. Хлопушка выбирает…' : 'С такой комбинацией пока нет картин в каталоге.';
+    $('clapperResult').hidden = false;
+    clearTimeout(clapperTimer);
+    clapperTimer = setTimeout(function () {
+      board.classList.remove('clapping');
+      if (!pick) {
+        $('clapperResultTitle').textContent = 'Нужен другой дубль';
+        $('clapperResultCard').innerHTML = '<p class="clapper-empty">В каталоге пока нет подходящих картин. Измени формат, жанр или эпоху.</p>';
+        return;
+      }
+      $('clapperResultTitle').textContent = pick.item.title;
+      $('clapperResultCard').innerHTML = cardMarkup(pick.type, pick.item, 0);
+      refreshFavoriteButtons();
+    }, reduce ? 0 : 940);
+  }
+  $('clapperForm').addEventListener('submit', function (event) { event.preventDefault(); runClapper(); });
+  $('clapperAgain').addEventListener('click', runClapper);
 
   /* ---------- carousel ---------- */
   var featuredFilms = films.slice(0, 5);
@@ -748,6 +936,7 @@
     } else saveSession(null);
     applyAuth();
     setMode(authed ? 'login' : 'reg');
+    await loadFavorites();
     route();
   }
   initializeApp();
